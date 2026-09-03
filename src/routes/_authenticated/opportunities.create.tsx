@@ -180,7 +180,7 @@ function OpportunityEntry() {
 
   return (
     <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <h2 className="font-display text-xl font-semibold">Sales entry</h2>
+      <h2 className="font-display text-xl font-semibold">Opportunity Create</h2>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <div className="grid gap-1.5 sm:col-span-2">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
