@@ -167,9 +167,11 @@ export type Database = {
       }
       big_opportunities: {
         Row: {
+          ambassador_price: number
           apply_url: string | null
           banner_url: string | null
           commission: number
+          coordinator_price: number
           created_at: string
           created_by: string | null
           description: string | null
@@ -177,14 +179,18 @@ export type Database = {
           is_active: boolean
           leadership_points_per_sale: number
           price: number
+          regular_price: number
           sort_order: number
+          student_price: number
           title: string
           updated_at: string
         }
         Insert: {
+          ambassador_price?: number
           apply_url?: string | null
           banner_url?: string | null
           commission?: number
+          coordinator_price?: number
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -192,14 +198,18 @@ export type Database = {
           is_active?: boolean
           leadership_points_per_sale?: number
           price?: number
+          regular_price?: number
           sort_order?: number
+          student_price?: number
           title: string
           updated_at?: string
         }
         Update: {
+          ambassador_price?: number
           apply_url?: string | null
           banner_url?: string | null
           commission?: number
+          coordinator_price?: number
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -207,7 +217,9 @@ export type Database = {
           is_active?: boolean
           leadership_points_per_sale?: number
           price?: number
+          regular_price?: number
           sort_order?: number
+          student_price?: number
           title?: string
           updated_at?: string
         }
@@ -1130,6 +1142,7 @@ export type Database = {
           brand_name: string | null
           brand_primary: string | null
           brand_title: string
+          certificate_threshold_percent: number
           created_at: string
           helpline_note: string | null
           helpline_whatsapp: string | null
@@ -1150,6 +1163,7 @@ export type Database = {
           brand_name?: string | null
           brand_primary?: string | null
           brand_title?: string
+          certificate_threshold_percent?: number
           created_at?: string
           helpline_note?: string | null
           helpline_whatsapp?: string | null
@@ -1170,6 +1184,7 @@ export type Database = {
           brand_name?: string | null
           brand_primary?: string | null
           brand_title?: string
+          certificate_threshold_percent?: number
           created_at?: string
           helpline_note?: string | null
           helpline_whatsapp?: string | null
@@ -1282,11 +1297,13 @@ export type Database = {
           deleted_at: string | null
           id: string
           invoice_no: string | null
+          notes: string | null
           order_no: string | null
           payment_method: string
           payment_ref: string | null
           season_id: string | null
           status: Database["public"]["Enums"]["sale_status"]
+          student_district: string | null
           student_email: string | null
           student_institution: string | null
           student_mobile: string
@@ -1306,11 +1323,13 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           invoice_no?: string | null
+          notes?: string | null
           order_no?: string | null
           payment_method: string
           payment_ref?: string | null
           season_id?: string | null
           status?: Database["public"]["Enums"]["sale_status"]
+          student_district?: string | null
           student_email?: string | null
           student_institution?: string | null
           student_mobile: string
@@ -1330,11 +1349,13 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           invoice_no?: string | null
+          notes?: string | null
           order_no?: string | null
           payment_method?: string
           payment_ref?: string | null
           season_id?: string | null
           status?: Database["public"]["Enums"]["sale_status"]
+          student_district?: string | null
           student_email?: string | null
           student_institution?: string | null
           student_mobile?: string
