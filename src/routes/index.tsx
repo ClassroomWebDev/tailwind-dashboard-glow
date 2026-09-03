@@ -117,14 +117,14 @@ const kpis: Kpi[] = [
 ];
 
 const revenueMonths = [
-  { month: "Jan", height: "46%", tone: "bg-accent/30" },
-  { month: "Feb", height: "55%", tone: "bg-accent/40" },
-  { month: "Mar", height: "42%", tone: "bg-accent/35" },
-  { month: "Apr", height: "68%", tone: "bg-accent/55" },
-  { month: "May", height: "60%", tone: "bg-accent/50" },
-  { month: "Jun", height: "82%", tone: "bg-accent/75" },
-  { month: "Jul", height: "74%", tone: "bg-accent/70" },
-  { month: "Aug", height: "92%", tone: "bg-accent" },
+  { month: "Jan", height: 92, tone: "bg-accent/30" },
+  { month: "Feb", height: 110, tone: "bg-accent/40" },
+  { month: "Mar", height: 84, tone: "bg-accent/35" },
+  { month: "Apr", height: 136, tone: "bg-accent/55" },
+  { month: "May", height: 120, tone: "bg-accent/50" },
+  { month: "Jun", height: 164, tone: "bg-accent/75" },
+  { month: "Jul", height: 148, tone: "bg-accent/70" },
+  { month: "Aug", height: 184, tone: "bg-accent" },
 ];
 
 type Activity = {
