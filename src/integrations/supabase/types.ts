@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          ambassador_code: string | null
+          ambassador_id: string | null
+          created_at: string
+          district: string
+          facebook_link: string | null
+          full_name: string
+          id: string
+          institution: string
+          mobile: string
+          season_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ambassador_code?: string | null
+          ambassador_id?: string | null
+          created_at?: string
+          district: string
+          facebook_link?: string | null
+          full_name: string
+          id?: string
+          institution: string
+          mobile: string
+          season_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ambassador_code?: string | null
+          ambassador_id?: string | null
+          created_at?: string
+          district?: string
+          facebook_link?: string | null
+          full_name?: string
+          id?: string
+          institution?: string
+          mobile?: string
+          season_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_ambassador_id_fkey"
+            columns: ["ambassador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendances: {
         Row: {
           ambassador_id: string
@@ -55,6 +115,7 @@ export type Database = {
       batches: {
         Row: {
           class_time: string | null
+          community_link: string | null
           course_id: string
           created_at: string
           created_by: string | null
@@ -68,6 +129,7 @@ export type Database = {
         }
         Insert: {
           class_time?: string | null
+          community_link?: string | null
           course_id: string
           created_at?: string
           created_by?: string | null
@@ -81,6 +143,7 @@ export type Database = {
         }
         Update: {
           class_time?: string | null
+          community_link?: string | null
           course_id?: string
           created_at?: string
           created_by?: string | null
@@ -101,6 +164,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      big_opportunities: {
+        Row: {
+          apply_url: string | null
+          banner_url: string | null
+          commission: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          leadership_points_per_sale: number
+          price: number
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          apply_url?: string | null
+          banner_url?: string | null
+          commission?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          leadership_points_per_sale?: number
+          price?: number
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          apply_url?: string | null
+          banner_url?: string | null
+          commission?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          leadership_points_per_sale?: number
+          price?: number
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       certificate_templates: {
         Row: {
@@ -476,6 +587,44 @@ export type Database = {
           },
         ]
       }
+      event_attendances: {
+        Row: {
+          ambassador_id: string
+          created_at: string
+          event_id: string
+          id: string
+          marked_by: string | null
+          present: boolean
+          updated_at: string
+        }
+        Insert: {
+          ambassador_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          marked_by?: string | null
+          present?: boolean
+          updated_at?: string
+        }
+        Update: {
+          ambassador_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          marked_by?: string | null
+          present?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendances_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           banner_url: string | null
@@ -484,6 +633,7 @@ export type Database = {
           description: string | null
           id: string
           is_cancelled: boolean
+          learning_points: number
           location: string
           starts_at: string
           title: string
@@ -496,6 +646,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_cancelled?: boolean
+          learning_points?: number
           location?: string
           starts_at: string
           title: string
@@ -508,6 +659,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_cancelled?: boolean
+          learning_points?: number
           location?: string
           starts_at?: string
           title?: string
@@ -764,6 +916,7 @@ export type Database = {
           auto_id: string | null
           badge_url: string | null
           blood_group: string | null
+          can_access_all_seasons: boolean
           career_objective: string | null
           coordinator_id: string | null
           created_at: string
@@ -824,6 +977,7 @@ export type Database = {
           auto_id?: string | null
           badge_url?: string | null
           blood_group?: string | null
+          can_access_all_seasons?: boolean
           career_objective?: string | null
           coordinator_id?: string | null
           created_at?: string
@@ -884,6 +1038,7 @@ export type Database = {
           auto_id?: string | null
           badge_url?: string | null
           blood_group?: string | null
+          can_access_all_seasons?: boolean
           career_objective?: string | null
           coordinator_id?: string | null
           created_at?: string
@@ -1032,6 +1187,45 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_resources: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       prospects: {
         Row: {
           ambassador_id: string
@@ -1082,7 +1276,8 @@ export type Database = {
           amount: number
           approved_at: string | null
           approved_by: string | null
-          course_id: string
+          big_opportunity_id: string | null
+          course_id: string | null
           created_at: string
           deleted_at: string | null
           id: string
@@ -1105,7 +1300,8 @@ export type Database = {
           amount?: number
           approved_at?: string | null
           approved_by?: string | null
-          course_id: string
+          big_opportunity_id?: string | null
+          course_id?: string | null
           created_at?: string
           deleted_at?: string | null
           id?: string
@@ -1128,7 +1324,8 @@ export type Database = {
           amount?: number
           approved_at?: string | null
           approved_by?: string | null
-          course_id?: string
+          big_opportunity_id?: string | null
+          course_id?: string | null
           created_at?: string
           deleted_at?: string | null
           id?: string
@@ -1147,6 +1344,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_big_opportunity_id_fkey"
+            columns: ["big_opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "big_opportunities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_course_id_fkey"
             columns: ["course_id"]
@@ -1285,6 +1489,42 @@ export type Database = {
           sort_order?: number
           updated_at?: string
           whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      support_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          label: string
+          platform: string
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          platform?: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          platform?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }
