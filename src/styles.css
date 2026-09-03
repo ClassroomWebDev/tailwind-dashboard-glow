@@ -38,6 +38,9 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  /* Brand dark red used for special/student pricing and sales analytics. */
+  --color-brand-red: #8b0000;
+  --color-brand-red-foreground: #ffffff;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
