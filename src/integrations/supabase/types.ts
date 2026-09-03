@@ -688,8 +688,6 @@ export type Database = {
           is_active: boolean
           link_url: string | null
           logo_url: string
-          logos: Json
-          name: string | null
           sort_order: number
           title: string
           updated_at: string
@@ -701,11 +699,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           link_url?: string | null
-          logo_url?: string
-          logos?: Json
-          name?: string | null
+          logo_url: string
           sort_order?: number
-          title?: string
+          title: string
           updated_at?: string
         }
         Update: {
@@ -716,8 +712,6 @@ export type Database = {
           is_active?: boolean
           link_url?: string | null
           logo_url?: string
-          logos?: Json
-          name?: string | null
           sort_order?: number
           title?: string
           updated_at?: string
@@ -729,58 +723,43 @@ export type Database = {
           author_name: string
           created_at: string
           id: string
-          image_url: string | null
           institution: string | null
-          is_published: boolean
-          name: string | null
+          moderated_by: string | null
           photo_url: string | null
-          quote: string | null
           rating: number
           review_text: string
           role: string | null
-          role_label: string | null
-          sort_order: number
           status: string
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           author_name: string
           created_at?: string
           id?: string
-          image_url?: string | null
           institution?: string | null
-          is_published?: boolean
-          name?: string | null
+          moderated_by?: string | null
           photo_url?: string | null
-          quote?: string | null
-          rating: number
+          rating?: number
           review_text: string
           role?: string | null
-          role_label?: string | null
-          sort_order?: number
           status?: string
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           author_name?: string
           created_at?: string
           id?: string
-          image_url?: string | null
           institution?: string | null
-          is_published?: boolean
-          name?: string | null
+          moderated_by?: string | null
           photo_url?: string | null
-          quote?: string | null
           rating?: number
           review_text?: string
           role?: string | null
-          role_label?: string | null
-          sort_order?: number
           status?: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -1162,7 +1141,7 @@ export type Database = {
           brand_logo_url: string | null
           brand_name: string | null
           brand_primary: string | null
-          brand_title: string | null
+          brand_title: string
           certificate_threshold_percent: number
           created_at: string
           helpline_note: string | null
@@ -1183,7 +1162,7 @@ export type Database = {
           brand_logo_url?: string | null
           brand_name?: string | null
           brand_primary?: string | null
-          brand_title?: string | null
+          brand_title?: string
           certificate_threshold_percent?: number
           created_at?: string
           helpline_note?: string | null
@@ -1204,7 +1183,7 @@ export type Database = {
           brand_logo_url?: string | null
           brand_name?: string | null
           brand_primary?: string | null
-          brand_title?: string | null
+          brand_title?: string
           certificate_threshold_percent?: number
           created_at?: string
           helpline_note?: string | null
