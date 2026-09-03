@@ -52,6 +52,56 @@ export type Database = {
           },
         ]
       }
+      batches: {
+        Row: {
+          class_time: string | null
+          course_id: string
+          created_at: string
+          created_by: string | null
+          days_of_week: number[]
+          id: string
+          name: string
+          notes: string | null
+          start_date: string
+          total_classes: number
+          updated_at: string
+        }
+        Insert: {
+          class_time?: string | null
+          course_id: string
+          created_at?: string
+          created_by?: string | null
+          days_of_week?: number[]
+          id?: string
+          name: string
+          notes?: string | null
+          start_date: string
+          total_classes?: number
+          updated_at?: string
+        }
+        Update: {
+          class_time?: string | null
+          course_id?: string
+          created_at?: string
+          created_by?: string | null
+          days_of_week?: number[]
+          id?: string
+          name?: string
+          notes?: string | null
+          start_date?: string
+          total_classes?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batches_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificate_templates: {
         Row: {
           authority_name: string | null
@@ -151,33 +201,55 @@ export type Database = {
       }
       class_sessions: {
         Row: {
+          batch_id: string | null
           course_id: string
           created_at: string
           created_by: string | null
           id: string
+          sequence_no: number | null
           session_date: string
+          session_type: string
+          start_time: string | null
+          status: string
           title: string
           updated_at: string
         }
         Insert: {
+          batch_id?: string | null
           course_id: string
           created_at?: string
           created_by?: string | null
           id?: string
+          sequence_no?: number | null
           session_date?: string
+          session_type?: string
+          start_time?: string | null
+          status?: string
           title: string
           updated_at?: string
         }
         Update: {
+          batch_id?: string | null
           course_id?: string
           created_at?: string
           created_by?: string | null
           id?: string
+          sequence_no?: number | null
           session_date?: string
+          session_type?: string
+          start_time?: string | null
+          status?: string
           title?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "class_sessions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "class_sessions_course_id_fkey"
             columns: ["course_id"]
@@ -245,6 +317,7 @@ export type Database = {
           email: string | null
           helpline: string | null
           id: string
+          is_active: boolean
           logo_url: string | null
           name: string
           social_links: Json
@@ -261,6 +334,7 @@ export type Database = {
           email?: string | null
           helpline?: string | null
           id?: string
+          is_active?: boolean
           logo_url?: string | null
           name: string
           social_links?: Json
@@ -277,6 +351,7 @@ export type Database = {
           email?: string | null
           helpline?: string | null
           id?: string
+          is_active?: boolean
           logo_url?: string | null
           name?: string
           social_links?: Json
@@ -285,6 +360,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      course_topics: {
+        Row: {
+          course_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_topics_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       courses: {
         Row: {
@@ -405,6 +521,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          is_active: boolean
           link_url: string | null
           logo_url: string
           sort_order: number
@@ -416,6 +533,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_active?: boolean
           link_url?: string | null
           logo_url: string
           sort_order?: number
@@ -427,6 +545,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_active?: boolean
           link_url?: string | null
           logo_url?: string
           sort_order?: number
@@ -598,6 +717,7 @@ export type Database = {
           address: string | null
           alt_mobile: string | null
           auto_id: string | null
+          badge_url: string | null
           blood_group: string | null
           career_objective: string | null
           coordinator_id: string | null
@@ -656,6 +776,7 @@ export type Database = {
           address?: string | null
           alt_mobile?: string | null
           auto_id?: string | null
+          badge_url?: string | null
           blood_group?: string | null
           career_objective?: string | null
           coordinator_id?: string | null
@@ -714,6 +835,7 @@ export type Database = {
           address?: string | null
           alt_mobile?: string | null
           auto_id?: string | null
+          badge_url?: string | null
           blood_group?: string | null
           career_objective?: string | null
           coordinator_id?: string | null
@@ -801,6 +923,9 @@ export type Database = {
       }
       program_settings: {
         Row: {
+          brand_logo_url: string | null
+          brand_name: string | null
+          brand_primary: string | null
           brand_title: string
           created_at: string
           id: boolean
@@ -816,6 +941,9 @@ export type Database = {
           value: Json | null
         }
         Insert: {
+          brand_logo_url?: string | null
+          brand_name?: string | null
+          brand_primary?: string | null
           brand_title?: string
           created_at?: string
           id?: boolean
@@ -831,6 +959,9 @@ export type Database = {
           value?: Json | null
         }
         Update: {
+          brand_logo_url?: string | null
+          brand_name?: string | null
+          brand_primary?: string | null
           brand_title?: string
           created_at?: string
           id?: boolean
