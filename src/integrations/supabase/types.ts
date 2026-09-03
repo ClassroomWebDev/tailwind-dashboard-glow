@@ -52,6 +52,103 @@ export type Database = {
           },
         ]
       }
+      certificate_templates: {
+        Row: {
+          authority_name: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          name: string
+          signature_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          authority_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          name?: string
+          signature_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          authority_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          name?: string
+          signature_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      certificates: {
+        Row: {
+          approved_by: string | null
+          course_id: string
+          created_at: string
+          id: string
+          issued_at: string | null
+          serial_no: string | null
+          status: string
+          template_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          issued_at?: string | null
+          serial_no?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          issued_at?: string | null
+          serial_no?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       class_sessions: {
         Row: {
           course_id: string
@@ -90,6 +187,54 @@ export type Database = {
           },
         ]
       }
+      cms_sections: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string | null
+          is_published: boolean
+          kind: string
+          link_label: string | null
+          link_url: string | null
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          kind?: string
+          link_label?: string | null
+          link_url?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          kind?: string
+          link_label?: string | null
+          link_url?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           ambassador_price: number
@@ -98,6 +243,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           details: string | null
+          end_date: string | null
           has_certificate: boolean
           id: string
           leadership_points_per_sale: number
@@ -105,6 +251,8 @@ export type Database = {
           mission: string | null
           name: string
           regular_price: number
+          season_id: string | null
+          start_date: string | null
           student_price: number
           updated_at: string
         }
@@ -115,6 +263,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           details?: string | null
+          end_date?: string | null
           has_certificate?: boolean
           id?: string
           leadership_points_per_sale?: number
@@ -122,6 +271,8 @@ export type Database = {
           mission?: string | null
           name: string
           regular_price?: number
+          season_id?: string | null
+          start_date?: string | null
           student_price?: number
           updated_at?: string
         }
@@ -132,6 +283,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           details?: string | null
+          end_date?: string | null
           has_certificate?: boolean
           id?: string
           leadership_points_per_sale?: number
@@ -139,10 +291,20 @@ export type Database = {
           mission?: string | null
           name?: string
           regular_price?: number
+          season_id?: string | null
+          start_date?: string | null
           student_price?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "courses_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
@@ -337,6 +499,7 @@ export type Database = {
           ref2_phone: string | null
           ref2_relation: string | null
           religion: string | null
+          season_id: string | null
           signature_url: string | null
           soft_skills: string | null
           status: Database["public"]["Enums"]["account_status"]
@@ -394,6 +557,7 @@ export type Database = {
           ref2_phone?: string | null
           ref2_relation?: string | null
           religion?: string | null
+          season_id?: string | null
           signature_url?: string | null
           soft_skills?: string | null
           status?: Database["public"]["Enums"]["account_status"]
@@ -451,6 +615,7 @@ export type Database = {
           ref2_phone?: string | null
           ref2_relation?: string | null
           religion?: string | null
+          season_id?: string | null
           signature_url?: string | null
           soft_skills?: string | null
           status?: Database["public"]["Enums"]["account_status"]
@@ -473,6 +638,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
             referencedColumns: ["id"]
           },
           {
@@ -581,6 +753,7 @@ export type Database = {
           order_no: string | null
           payment_method: string
           payment_ref: string | null
+          season_id: string | null
           status: Database["public"]["Enums"]["sale_status"]
           student_email: string | null
           student_institution: string | null
@@ -603,6 +776,7 @@ export type Database = {
           order_no?: string | null
           payment_method: string
           payment_ref?: string | null
+          season_id?: string | null
           status?: Database["public"]["Enums"]["sale_status"]
           student_email?: string | null
           student_institution?: string | null
@@ -625,6 +799,7 @@ export type Database = {
           order_no?: string | null
           payment_method?: string
           payment_ref?: string | null
+          season_id?: string | null
           status?: Database["public"]["Enums"]["sale_status"]
           student_email?: string | null
           student_institution?: string | null
@@ -642,7 +817,47 @@ export type Database = {
             referencedRelation: "courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "sales_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      seasons: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          is_active: boolean
+          is_archived: boolean
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          is_active?: boolean
+          is_archived?: boolean
+          start_date?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          is_archived?: boolean
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -729,6 +944,7 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: string
       }
+      next_certificate_serial: { Args: never; Returns: string }
       recalc_points: { Args: { _user_id: string }; Returns: undefined }
       role_prefix: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
