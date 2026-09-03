@@ -268,7 +268,7 @@ function TeamPanel({ title, showSalesLink = false }: { title: string; showSalesL
         <h2 className="font-display text-xl font-semibold">{title}</h2>
         {showSalesLink ? (
           <Button asChild size="sm">
-            <Link to="/sales/new" search={{ item: "" }}>New opportunity</Link>
+            <Link to="/opportunities/create">Opportunity Create</Link>
           </Button>
         ) : null}
       </div>

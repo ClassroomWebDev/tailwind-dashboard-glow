@@ -6,6 +6,8 @@ import {
   CalendarCheck,
   CalendarDays,
   CalendarRange,
+  FilePlus2,
+  History,
   LayoutDashboard,
   LayoutTemplate,
   LifeBuoy,
@@ -35,7 +37,8 @@ type NavItem = {
     | "/courses"
     | "/attendance"
     | "/sales"
-    | "/sales/new"
+    | "/opportunities/create"
+    | "/opportunities/history"
     | "/leaderboard"
     | "/users"
     | "/notices"
@@ -73,7 +76,8 @@ function navForRole(role: AppRole | undefined): NavItem[] {
   const bigOpportunity: NavItem = { to: "/big-opportunity", label: "Big Opportunity", icon: Rocket };
 
   const courses: NavItem = { to: "/courses", label: "Courses", icon: BookOpen };
-  const newOpportunity: NavItem = { to: "/sales/new", label: "New Opportunity", icon: ReceiptText };
+  const opportunityCreate: NavItem = { to: "/opportunities/create", label: "Opportunity Create", icon: FilePlus2 };
+  const opportunityHistory: NavItem = { to: "/opportunities/history", label: "Opportunities History", icon: History };
 
   if (role === "admin" || role === "support_manager") {
     return [
@@ -81,7 +85,8 @@ function navForRole(role: AppRole | undefined): NavItem[] {
       leaderboard,
       { to: "/sales", label: "My Opportunities", icon: ReceiptText, badge: "pending-sales" },
       bigOpportunity,
-      newOpportunity,
+      opportunityCreate,
+      opportunityHistory,
       courses,
       events,
       calendar,
@@ -104,7 +109,8 @@ function navForRole(role: AppRole | undefined): NavItem[] {
       leaderboard,
       { to: "/sales", label: "My Opportunities", icon: ReceiptText },
       bigOpportunity,
-      newOpportunity,
+      opportunityCreate,
+      opportunityHistory,
       events,
       calendar,
       { to: "/attendance", label: "Take Attendance", icon: CalendarCheck },
@@ -122,7 +128,8 @@ function navForRole(role: AppRole | undefined): NavItem[] {
     leaderboard,
     { to: "/sales", label: "My Opportunities", icon: ReceiptText },
     bigOpportunity,
-    newOpportunity,
+    opportunityCreate,
+    opportunityHistory,
     events,
     calendar,
     { to: "/attendance", label: "Attendance Log", icon: CalendarCheck },
