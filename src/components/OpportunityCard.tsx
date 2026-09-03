@@ -109,9 +109,11 @@ export function OpportunityCard({
 
         <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Tier label="Regular fee" value={item.regular} />
-          <div className="rounded-xl bg-red-800 px-3 py-2 text-white">
-            <p className="text-[0.65rem] font-bold uppercase tracking-wide text-white/80">For student (special)</p>
-            <p className="font-display text-sm font-bold text-white">{money(item.student)}</p>
+          <div className="rounded-xl bg-brand-red px-3 py-2 text-brand-red-foreground">
+            <p className="text-[0.65rem] font-bold uppercase tracking-wide text-brand-red-foreground/80">
+              For student (special)
+            </p>
+            <p className="font-display text-sm font-bold text-brand-red-foreground">{money(item.student)}</p>
           </div>
           <Tier label="For coordinator" value={item.coordinator} />
           <Tier label="For ambassador" value={item.ambassador} />
