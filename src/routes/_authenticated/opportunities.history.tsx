@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/opportunities/history")({
   component: OpportunitiesHistoryPage,
 });
 
-const BRAND_RED = "#991B1B";
+const BRAND_RED = "#8B0000";
 const SLATE = "#334155";
 const money = (v: number) => `৳${Number(v || 0).toLocaleString("en-US")}`;
 const PAYMENT_METHODS = ["bKash", "Nagad", "Rocket", "Bank Transfer"] as const;
