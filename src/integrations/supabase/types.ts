@@ -607,6 +607,51 @@ export type Database = {
           },
         ]
       }
+      milestone_achievements: {
+        Row: {
+          achieved_at: string
+          created_at: string
+          id: string
+          leadership_points: number
+          learning_points: number
+          milestone_id: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          leadership_points?: number
+          learning_points?: number
+          milestone_id: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          leadership_points?: number
+          learning_points?: number
+          milestone_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestone_achievements_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "season_milestones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milestone_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notices: {
         Row: {
           audience: Database["public"]["Enums"]["notice_audience"]
@@ -722,6 +767,7 @@ export type Database = {
           career_objective: string | null
           coordinator_id: string | null
           created_at: string
+          created_by: string | null
           date_of_birth: string | null
           designation: string | null
           education: Json
@@ -781,6 +827,7 @@ export type Database = {
           career_objective?: string | null
           coordinator_id?: string | null
           created_at?: string
+          created_by?: string | null
           date_of_birth?: string | null
           designation?: string | null
           education?: Json
@@ -840,6 +887,7 @@ export type Database = {
           career_objective?: string | null
           coordinator_id?: string | null
           created_at?: string
+          created_by?: string | null
           date_of_birth?: string | null
           designation?: string | null
           education?: Json
@@ -928,6 +976,8 @@ export type Database = {
           brand_primary: string | null
           brand_title: string
           created_at: string
+          helpline_note: string | null
+          helpline_whatsapp: string | null
           id: boolean
           key: string
           org_address: string | null
@@ -946,6 +996,8 @@ export type Database = {
           brand_primary?: string | null
           brand_title?: string
           created_at?: string
+          helpline_note?: string | null
+          helpline_whatsapp?: string | null
           id?: boolean
           key: string
           org_address?: string | null
@@ -964,6 +1016,8 @@ export type Database = {
           brand_primary?: string | null
           brand_title?: string
           created_at?: string
+          helpline_note?: string | null
+          helpline_whatsapp?: string | null
           id?: boolean
           key?: string
           org_address?: string | null
@@ -1109,6 +1163,50 @@ export type Database = {
           },
         ]
       }
+      season_milestones: {
+        Row: {
+          created_at: string
+          id: string
+          min_leadership_points: number
+          min_learning_points: number
+          reward_description: string | null
+          season_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          min_leadership_points?: number
+          min_learning_points?: number
+          reward_description?: string | null
+          season_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          min_leadership_points?: number
+          min_learning_points?: number
+          reward_description?: string | null
+          season_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_milestones_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seasons: {
         Row: {
           created_at: string
@@ -1139,6 +1237,54 @@ export type Database = {
           start_date?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      support_contacts: {
+        Row: {
+          available_hours: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean
+          phone: string | null
+          photo_url: string | null
+          role_label: string | null
+          sort_order: number
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          available_hours?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          photo_url?: string | null
+          role_label?: string | null
+          sort_order?: number
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          available_hours?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          photo_url?: string | null
+          role_label?: string | null
+          sort_order?: number
+          updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -1179,6 +1325,19 @@ export type Database = {
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       leaderboard_ambassadors: {
         Args: { _limit?: number }
+        Returns: {
+          auto_id: string
+          full_name: string
+          institution: string
+          leadership_points: number
+          learning_points: number
+          rank: number
+          total_points: number
+          user_id: string
+        }[]
+      }
+      leaderboard_ambassadors_season: {
+        Args: { _limit?: number; _season_id?: string }
         Returns: {
           auto_id: string
           full_name: string
@@ -1232,6 +1391,10 @@ export type Database = {
       role_prefix: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: string
+      }
+      sync_milestone_achievements: {
+        Args: { _user_id: string }
+        Returns: undefined
       }
     }
     Enums: {
