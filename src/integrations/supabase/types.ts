@@ -238,6 +238,7 @@ export type Database = {
       company_wings: {
         Row: {
           address: string | null
+          badge_label: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -253,6 +254,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          badge_label?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -268,6 +270,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          badge_label?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -795,6 +798,7 @@ export type Database = {
       }
       program_settings: {
         Row: {
+          brand_title: string
           created_at: string
           id: boolean
           org_address: string | null
@@ -807,6 +811,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          brand_title?: string
           created_at?: string
           id?: boolean
           org_address?: string | null
@@ -819,6 +824,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          brand_title?: string
           created_at?: string
           id?: boolean
           org_address?: string | null
