@@ -26,14 +26,14 @@ export function MyTeamAmbassadors({ seasonId }: { seasonId: string }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Users className="size-5 text-primary" />
-          <h2 className="font-display text-xl font-semibold">My team (campus ambassadors)</h2>
+          <h2 className="font-display text-xl font-semibold">Hierarchy team explorer</h2>
         </div>
         <div className="relative sm:w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, student ID or campus"
+            placeholder="Search by name, ID or campus"
             className="pl-9"
           />
         </div>

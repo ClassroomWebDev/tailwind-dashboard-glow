@@ -115,3 +115,71 @@ export const coordinatorSalesMetrics = createServerFn({ method: "GET" })
 
     return Object.values(base).sort((a, b) => b.season - a.season || a.full_name.localeCompare(b.full_name));
   });
+
+export type AmbassadorMetrics = {
+  ambassador_id: string;
+  auto_id: string | null;
+  full_name: string;
+  institution: string | null;
+  learning_points: number;
+  leadership_points: number;
+  conversions: number;
+  revenue: number;
+};
+
+/** Per-ambassador conversions + revenue, scoped to the caller's hierarchy. */
+export const ambassadorSalesMetrics = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => metricsSchema.parse(d ?? {}))
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<AmbassadorMetrics[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: myRoles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", context.userId);
+    const roles = new Set((myRoles ?? []).map((r) => r.role as string));
+    const privileged = roles.has("admin") || roles.has("support_manager") || roles.has("mentor");
+    if (!privileged && !roles.has("coordinator")) return [];
+
+    const [{ data: profiles }, { data: roleRows }, { data: sales }] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select("id, auto_id, full_name, institution, coordinator_id, season_id, learning_points, leadership_points"),
+      supabaseAdmin.from("user_roles").select("user_id, role"),
+      supabaseAdmin
+        .from("sales")
+        .select("id, ambassador_id, amount, status, season_id, deleted_at")
+        .eq("status", "approved")
+        .is("deleted_at", null),
+    ]);
+
+    const ambassadorIds = new Set(
+      (roleRows ?? []).filter((r) => r.role === "ambassador").map((r) => r.user_id as string),
+    );
+
+    let people = (profiles ?? []).filter((p) => ambassadorIds.has(p.id));
+    if (!privileged) people = people.filter((p) => p.coordinator_id === context.userId);
+    if (data.season_id) people = people.filter((p) => p.season_id === data.season_id);
+
+    const base: Record<string, AmbassadorMetrics> = {};
+    for (const p of people) {
+      base[p.id] = {
+        ambassador_id: p.id,
+        auto_id: p.auto_id,
+        full_name: p.full_name,
+        institution: p.institution,
+        learning_points: Number(p.learning_points ?? 0),
+        leadership_points: Number(p.leadership_points ?? 0),
+        conversions: 0,
+        revenue: 0,
+      };
+    }
+
+    for (const s of sales ?? []) {
+      const row = base[s.ambassador_id as string];
+      if (!row) continue;
+      if (data.season_id && s.season_id !== data.season_id) continue;
+      row.conversions += 1;
+      row.revenue += Number(s.amount ?? 0);
+    }
+
+    return Object.values(base).sort((a, b) => b.revenue - a.revenue || a.full_name.localeCompare(b.full_name));
+  });

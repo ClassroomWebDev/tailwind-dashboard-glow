@@ -6,8 +6,9 @@ import { Loader2, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchActiveSeasonId } from "@/hooks/useSeasons";
 import { useMyRole, useProfile } from "@/hooks/useProfile";
-import { useCourses, useTeam } from "@/hooks/useBusiness";
+import { useCourses } from "@/hooks/useBusiness";
 import { useBigOpportunities } from "@/hooks/useBigOpportunities";
+import { useDirectory } from "@/hooks/useDirectory";
 import { DistrictSelect } from "@/components/DistrictSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,9 +65,19 @@ function OpportunityEntry() {
   const { data: profile } = useProfile();
   const { data: courses } = useCourses();
   const { data: programmes } = useBigOpportunities(true);
-  const { data: team } = useTeam();
+  const { data: directory } = useDirectory();
   const queryClient = useQueryClient();
   const selfOnly = role === "ambassador" || !role;
+
+  /** Coordinator: only their own ambassadors. Admin / manager: everyone. */
+  const ambassadorOptions = useMemo(
+    () =>
+      (directory ?? [])
+        .filter((m) => m.role === "ambassador")
+        .filter((m) => (role === "coordinator" ? m.coordinator_id === profile?.id : true))
+        .sort((a, b) => a.full_name.localeCompare(b.full_name)),
+    [directory, role, profile?.id],
+  );
 
   // "course:<id>" for regular courses, "big:<id>" for Big Opportunity programmes.
   const [selection, setSelection] = useState("");
@@ -143,6 +154,18 @@ function OpportunityEntry() {
       toast.error("Student name and mobile are required");
       return;
     }
+    if (!orderNo.trim()) {
+      toast.error("Order ID is required");
+      return;
+    }
+    if (!studentInstitution.trim()) {
+      toast.error("Institution is required");
+      return;
+    }
+    if (!studentDistrict.trim()) {
+      toast.error("District is required");
+      return;
+    }
 
     setSaving(true);
     const { data: userData } = await supabase.auth.getUser();
@@ -158,7 +181,7 @@ function OpportunityEntry() {
       student_institution: studentInstitution.trim() || null,
       student_district: studentDistrict.trim() || null,
       payment_method: paymentMethod,
-      order_no: orderNo.trim() || null,
+      order_no: orderNo.trim(),
       payment_ref: paymentRef.trim() || null,
       notes: notes.trim() || null,
       status: "pending",
@@ -260,7 +283,12 @@ function OpportunityEntry() {
         <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">CREDITED TO *</Label>
           {selfOnly ? (
-            <Input value={`Myself (${profile?.full_name ?? "me"})`} readOnly disabled className="bg-muted" />
+            <Input
+              value={`${profile?.full_name ?? "Me"} (${profile?.auto_id ?? "—"})`}
+              readOnly
+              disabled
+              className="bg-muted"
+            />
           ) : (
             <select
               value={ambassadorId}
@@ -268,9 +296,9 @@ function OpportunityEntry() {
               className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
             >
               <option value="">Myself ({profile?.full_name ?? "me"})</option>
-              {(team ?? []).filter(Boolean).map((m) => (
+              {ambassadorOptions.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.full_name || "Member"}
+                  {m.full_name || "Member"} ({m.auto_id ?? "—"})
                 </option>
               ))}
             </select>
@@ -278,7 +306,7 @@ function OpportunityEntry() {
         </div>
 
         <div className="grid gap-1.5">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Order ID</Label>
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Order ID *</Label>
           <Input value={orderNo} onChange={(e) => setOrderNo(e.target.value)} placeholder="Order / invoice reference" />
         </div>
 
@@ -295,11 +323,11 @@ function OpportunityEntry() {
           <Input type="email" value={studentEmail} onChange={(e) => setStudentEmail(e.target.value)} />
         </div>
         <div className="grid gap-1.5">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institution</Label>
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institution *</Label>
           <Input value={studentInstitution} onChange={(e) => setStudentInstitution(e.target.value)} />
         </div>
         <div className="grid gap-1.5">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">District</Label>
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">District *</Label>
           <DistrictSelect value={studentDistrict} onChange={setStudentDistrict} />
         </div>
 

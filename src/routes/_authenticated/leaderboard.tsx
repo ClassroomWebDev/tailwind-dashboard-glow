@@ -5,6 +5,7 @@ import { HierarchyTeamExplorer } from "@/components/HierarchyTeamExplorer";
 import { CoordinatorSalesAnalytics } from "@/components/CoordinatorSalesAnalytics";
 import { SeasonFilter, useSeasonFilter } from "@/components/SeasonFilter";
 import { useMyRole } from "@/hooks/useProfile";
+import { AmbassadorSalesAnalytics } from "@/components/AmbassadorSalesAnalytics";
 import { MilestoneAchievers } from "@/components/MilestoneAchievers";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
@@ -52,7 +53,12 @@ function LeaderboardPage() {
       ) : (
         <>
           <Leaderboard limit={10} seasonId={seasonId} />
-          {isCoordinator ? <MyTeamAmbassadors seasonId={seasonId} /> : null}
+          {isCoordinator ? (
+            <>
+              <MyTeamAmbassadors seasonId={seasonId} />
+              <AmbassadorSalesAnalytics seasonId={seasonId} />
+            </>
+          ) : null}
           {isCoordinator || isUpperTier ? <MilestoneAchievers seasonId={seasonId} role={role} /> : null}
           {isUpperTier ? (
             <>

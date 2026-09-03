@@ -16,6 +16,8 @@ export type OpportunityItem = {
   ambassador: number;
   leadershipPoints: number;
   learningPointsPerClass: number;
+  /** Show the "Certificate Included" badge next to the title. */
+  hasCertificate?: boolean | null;
   /** Set for real courses — unlocks curriculum + batch metadata. */
   courseId?: string | null;
   /** External admission / landing link (Big Opportunity only). */
@@ -24,14 +26,25 @@ export type OpportunityItem = {
 
 const money = (v: number) => (Number(v) > 0 ? `৳${Number(v).toLocaleString("en-US")}` : "Free");
 
-function Tier({ label, value }: { label: string; value: number }) {
+/** Discount vs the regular fee, rounded to a whole percent. */
+function scholarship(regular: number, price: number) {
+  const r = Number(regular || 0);
+  const p = Number(price || 0);
+  if (r <= 0 || p >= r) return null;
+  return Math.round(((r - p) / r) * 100);
+}
+
+function Tier({ label, value, regular }: { label: string; value: number; regular: number }) {
+  const pct = scholarship(regular, value);
   return (
     <div className="rounded-xl border border-border bg-background px-3 py-2">
       <p className="text-[0.65rem] font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="font-display text-sm font-bold">{money(value)}</p>
+      {pct !== null ? <p className="text-[0.65rem] font-semibold text-primary">{pct}% Scholarship</p> : null}
     </div>
   );
 }
+
 
 /** Active/scheduled batch line with the classroom group shortcut. */
 function BatchMeta({ courseId }: { courseId: string }) {
@@ -98,7 +111,14 @@ export function OpportunityCard({
       ) : null}
       <div className="p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <h3 className="font-display text-xl font-bold leading-tight">{item.title}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-display text-xl font-bold leading-tight">{item.title}</h3>
+            {item.hasCertificate ? (
+              <Badge variant="outline" className="border-primary/40 text-primary">
+                Certificate Included
+              </Badge>
+            ) : null}
+          </div>
           <Badge variant="secondary" className="shrink-0">
             {item.tag}
           </Badge>
@@ -108,16 +128,22 @@ export function OpportunityCard({
         ) : null}
 
         <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Tier label="Regular fee" value={item.regular} />
+          <Tier label="Regular fee" value={item.regular} regular={item.regular} />
           <div className="rounded-xl bg-brand-red px-3 py-2 text-brand-red-foreground">
             <p className="text-[0.65rem] font-bold uppercase tracking-wide text-brand-red-foreground/80">
               For student (special)
             </p>
             <p className="font-display text-sm font-bold text-brand-red-foreground">{money(item.student)}</p>
+            {scholarship(item.regular, item.student) !== null ? (
+              <p className="text-[0.65rem] font-semibold text-brand-red-foreground/85">
+                {scholarship(item.regular, item.student)}% Scholarship
+              </p>
+            ) : null}
           </div>
-          <Tier label="For coordinator" value={item.coordinator} />
-          <Tier label="For ambassador" value={item.ambassador} />
+          <Tier label="For coordinator" value={item.coordinator} regular={item.regular} />
+          <Tier label="For ambassador" value={item.ambassador} regular={item.regular} />
         </div>
+
 
         <div className="mt-4 flex flex-wrap gap-2">
           {item.learningPointsPerClass > 0 ? (
