@@ -408,12 +408,12 @@ function Index() {
                     }}
                   ></div>
                   <div className="absolute bottom-0 left-0 right-0 h-[4px] rounded-full bg-accent/20"></div>
-                  <div className="absolute flex items-end gap-3 px-7 h-[200px]">
+                  <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 px-7 h-[200px]">
                     {revenueMonths.map((m) => (
                       <div
                         key={m.month}
-                        className={`flex-1 rounded-t-md ${m.tone}`}
-                        style={{ height: m.height }}
+                        className={`flex-1 min-w-0 rounded-t-md ${m.tone}`}
+                        style={{ height: `${m.height}px` }}
                       ></div>
                     ))}
                   </div>
