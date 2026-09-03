@@ -1,23 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BadgeCheck, Loader2, Printer, RotateCcw, Send, Trash2 } from "lucide-react";
+import { BadgeCheck, Loader2, Printer, RotateCcw, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchActiveSeasonId } from "@/hooks/useSeasons";
-import { useMyRole, useProfile } from "@/hooks/useProfile";
-import { isStaffRole, useCourses, useProgramSettings, useSales, useTeam, type Sale } from "@/hooks/useBusiness";
+import { useMyRole } from "@/hooks/useProfile";
+import { isStaffRole, useCourses, useProgramSettings, useSales, type Sale } from "@/hooks/useBusiness";
 import { MoneyReceipt } from "@/components/MoneyReceipt";
-import { DistrictSelect } from "@/components/DistrictSelect";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SeasonFilter, useSeasonFilter } from "@/components/SeasonFilter";
 import { useBigOpportunities } from "@/hooks/useBigOpportunities";
 import { OpportunityCard, type OpportunityItem } from "@/components/OpportunityCard";
-import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/format";
 
 import { useQuery } from "@tanstack/react-query";
@@ -40,7 +35,6 @@ export const Route = createFileRoute("/_authenticated/sales")({
   component: OpportunityPage,
 });
 
-const PAYMENT_METHODS = ["bKash", "Nagad", "Rocket", "Bank Transfer"] as const;
 const money = (v: number) => `৳${Number(v || 0).toLocaleString("en-US")}`;
 
 function OpportunityPage() {
