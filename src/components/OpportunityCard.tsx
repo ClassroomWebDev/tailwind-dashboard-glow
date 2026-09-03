@@ -16,6 +16,8 @@ export type OpportunityItem = {
   ambassador: number;
   leadershipPoints: number;
   learningPointsPerClass: number;
+  /** Show the "Certificate Included" badge next to the title. */
+  hasCertificate?: boolean | null;
   /** Set for real courses — unlocks curriculum + batch metadata. */
   courseId?: string | null;
   /** External admission / landing link (Big Opportunity only). */
@@ -24,14 +26,25 @@ export type OpportunityItem = {
 
 const money = (v: number) => (Number(v) > 0 ? `৳${Number(v).toLocaleString("en-US")}` : "Free");
 
-function Tier({ label, value }: { label: string; value: number }) {
+/** Discount vs the regular fee, rounded to a whole percent. */
+function scholarship(regular: number, price: number) {
+  const r = Number(regular || 0);
+  const p = Number(price || 0);
+  if (r <= 0 || p >= r) return null;
+  return Math.round(((r - p) / r) * 100);
+}
+
+function Tier({ label, value, regular }: { label: string; value: number; regular: number }) {
+  const pct = scholarship(regular, value);
   return (
     <div className="rounded-xl border border-border bg-background px-3 py-2">
       <p className="text-[0.65rem] font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="font-display text-sm font-bold">{money(value)}</p>
+      {pct !== null ? <p className="text-[0.65rem] font-semibold text-primary">{pct}% Scholarship</p> : null}
     </div>
   );
 }
+
 
 /** Active/scheduled batch line with the classroom group shortcut. */
 function BatchMeta({ courseId }: { courseId: string }) {
