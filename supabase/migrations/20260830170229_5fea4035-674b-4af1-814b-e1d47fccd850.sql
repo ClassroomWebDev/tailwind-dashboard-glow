@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.can_view_all_sales(uuid) FROM PUBLIC, anon, authenticated;

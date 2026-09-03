@@ -1,0 +1,10 @@
+REVOKE ALL ON FUNCTION public.is_staff(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.is_my_ambassador(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.recalc_points(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.points_sync() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.sales_on_approve() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.guard_points_columns() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.update_updated_at_column() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.has_role(uuid, public.app_role) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.is_my_supervisor(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;

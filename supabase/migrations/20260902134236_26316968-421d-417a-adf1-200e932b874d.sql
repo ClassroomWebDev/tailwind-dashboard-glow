@@ -1,0 +1,1 @@
+ALTER TABLE public.company_wings ADD COLUMN IF NOT EXISTS badge_label text;
