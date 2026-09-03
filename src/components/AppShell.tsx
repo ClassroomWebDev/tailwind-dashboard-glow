@@ -79,69 +79,48 @@ function navForRole(role: AppRole | undefined): NavItem[] {
   const opportunityCreate: NavItem = { to: "/opportunities/create", label: "Opportunity Create", icon: FilePlus2 };
   const opportunityHistory: NavItem = { to: "/opportunities/history", label: "Opportunities History", icon: History };
 
+  const attendance: NavItem = { to: "/attendance", label: "Attendance Log", icon: CalendarCheck };
+  const myOpportunities = (badge: boolean): NavItem =>
+    badge
+      ? { to: "/sales", label: "My Opportunities", icon: ReceiptText, badge: "pending-sales" }
+      : { to: "/sales", label: "My Opportunities", icon: ReceiptText };
+
+  // Group 1 — overview | Group 2 — opportunities | Group 3 — programme | Group 4 — organisation
+  const group2 = (badge: boolean) => [myOpportunities(badge), bigOpportunity, opportunityCreate, opportunityHistory];
+  const group4 = [branding, notices, about, support, profile];
+
   if (role === "admin" || role === "support_manager") {
     return [
       dashboard,
       leaderboard,
-      { to: "/sales", label: "My Opportunities", icon: ReceiptText, badge: "pending-sales" },
-      bigOpportunity,
-      opportunityCreate,
-      opportunityHistory,
+      ...group2(true),
       courses,
       events,
       calendar,
-      { to: "/attendance", label: "Attendance", icon: CalendarCheck },
+      attendance,
       reviews,
       certificates,
-      branding,
-      notices,
+      ...group4,
       { to: "/seasons", label: "Seasons", icon: Timer },
       { to: "/cms", label: "Website CMS", icon: LayoutTemplate },
       { to: "/users", label: "Users", icon: Users },
-      about,
-      support,
-      profile,
     ];
   }
-  if (role === "coordinator" || role === "mentor") {
-    return [
-      dashboard,
-      leaderboard,
-      { to: "/sales", label: "My Opportunities", icon: ReceiptText },
-      bigOpportunity,
-      opportunityCreate,
-      opportunityHistory,
-      events,
-      calendar,
-      { to: "/attendance", label: "Take Attendance", icon: CalendarCheck },
-      reviews,
-      certificates,
-      branding,
-      notices,
-      about,
-      support,
-      profile,
-    ];
-  }
+
+  // Courses is intentionally hidden from ambassadors, coordinators and faculty.
   return [
     dashboard,
     leaderboard,
-    { to: "/sales", label: "My Opportunities", icon: ReceiptText },
-    bigOpportunity,
-    opportunityCreate,
-    opportunityHistory,
+    ...group2(false),
     events,
     calendar,
-    { to: "/attendance", label: "Attendance Log", icon: CalendarCheck },
+    attendance,
     reviews,
     certificates,
-    branding,
-    notices,
-    about,
-    support,
-    profile,
+    ...group4,
   ];
 }
+
 
 
 

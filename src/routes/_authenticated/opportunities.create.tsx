@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/opportunities/create")({
       { title: "Opportunity Create — Ambassador Hub" },
       {
         name: "description",
-        content: "Submit a new sale opportunity for any published course or Big Opportunity programme.",
+        content: "Submit a new sale opportunity for any published opportunity.",
       },
       { property: "og:title", content: "Opportunity Create — Ambassador Hub" },
       { property: "og:description", content: "Record a sale opportunity and earn leadership points on approval." },
@@ -50,7 +50,7 @@ function OpportunityCreatePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Opportunity</p>
         <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">Opportunity Create</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Log a new sale for any published course or Big Opportunity programme — leadership points arrive once it is
+          Log a new sale for any published opportunity — leadership points arrive once it is
           verified.
         </p>
       </header>
@@ -132,7 +132,7 @@ function OpportunityEntry() {
 
   async function submit() {
     if (!selection) {
-      toast.error("Select a course or programme");
+      toast.error("Select an opportunity");
       return;
     }
     if (!effectiveAmbassadorId) {
@@ -180,19 +180,19 @@ function OpportunityEntry() {
 
   return (
     <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <h2 className="font-display text-xl font-semibold">Sales entry</h2>
+      <h2 className="font-display text-xl font-semibold">Opportunity Create</h2>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <div className="grid gap-1.5 sm:col-span-2">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Course / programme *
+            Opportunity *
           </Label>
           <select
             value={selection}
             onChange={(e) => setSelection(e.target.value)}
             className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
           >
-            <option value="">Select course or programme</option>
-            <optgroup label="Courses">
+            <option value="">Select opportunity</option>
+            <optgroup label="My Opportunities">
               {(courses ?? []).filter(Boolean).map((c) => (
                 <option key={c.id} value={`course:${c.id}`}>
                   {c.name}
@@ -246,21 +246,21 @@ function OpportunityEntry() {
 
         <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Connected affiliate / referrer ID
+            CONNECTED ID
           </Label>
           <Input value={profile?.auto_id ?? "—"} readOnly className="bg-muted" />
         </div>
         <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Connected affiliate / referrer name
+            CONNECTED NAME
           </Label>
           <Input value={profile?.full_name ?? "—"} readOnly className="bg-muted" />
         </div>
 
         <div className="grid gap-1.5">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Credited to *</Label>
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">CREDITED TO *</Label>
           {selfOnly ? (
-            <Input value={profile?.full_name ?? "You"} readOnly className="bg-muted" />
+            <Input value={`Myself (${profile?.full_name ?? "me"})`} readOnly disabled className="bg-muted" />
           ) : (
             <select
               value={ambassadorId}
