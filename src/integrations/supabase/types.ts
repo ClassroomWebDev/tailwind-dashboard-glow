@@ -235,6 +235,54 @@ export type Database = {
         }
         Relationships: []
       }
+      company_wings: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          email: string | null
+          helpline: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          social_links: Json
+          sort_order: number
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          helpline?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          social_links?: Json
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          helpline?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          social_links?: Json
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           ambassador_price: number
@@ -344,6 +392,95 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      logo_boards: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          link_url: string | null
+          logo_url: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link_url?: string | null
+          logo_url: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link_url?: string | null
+          logo_url?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      member_reviews: {
+        Row: {
+          author_name: string
+          created_at: string
+          id: string
+          institution: string | null
+          moderated_by: string | null
+          photo_url: string | null
+          rating: number
+          review_text: string
+          role: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          created_at?: string
+          id?: string
+          institution?: string | null
+          moderated_by?: string | null
+          photo_url?: string | null
+          rating?: number
+          review_text: string
+          role?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          created_at?: string
+          id?: string
+          institution?: string | null
+          moderated_by?: string | null
+          photo_url?: string | null
+          rating?: number
+          review_text?: string
+          role?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notices: {
         Row: {
