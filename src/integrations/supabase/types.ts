@@ -289,6 +289,7 @@ export type Database = {
       courses: {
         Row: {
           ambassador_price: number
+          banner_url: string | null
           class_quantity: number
           coordinator_price: number
           created_at: string
@@ -309,6 +310,7 @@ export type Database = {
         }
         Insert: {
           ambassador_price?: number
+          banner_url?: string | null
           class_quantity?: number
           coordinator_price?: number
           created_at?: string
@@ -329,6 +331,7 @@ export type Database = {
         }
         Update: {
           ambassador_price?: number
+          banner_url?: string | null
           class_quantity?: number
           coordinator_price?: number
           created_at?: string
@@ -801,6 +804,7 @@ export type Database = {
           brand_title: string
           created_at: string
           id: boolean
+          key: string
           org_address: string | null
           org_facebook: string | null
           org_helpline: string | null
@@ -809,11 +813,13 @@ export type Database = {
           season_start: string
           season_target_points: number
           updated_at: string
+          value: Json | null
         }
         Insert: {
           brand_title?: string
           created_at?: string
           id?: boolean
+          key: string
           org_address?: string | null
           org_facebook?: string | null
           org_helpline?: string | null
@@ -822,11 +828,13 @@ export type Database = {
           season_start?: string
           season_target_points?: number
           updated_at?: string
+          value?: Json | null
         }
         Update: {
           brand_title?: string
           created_at?: string
           id?: boolean
+          key?: string
           org_address?: string | null
           org_facebook?: string | null
           org_helpline?: string | null
@@ -835,6 +843,7 @@ export type Database = {
           season_start?: string
           season_target_points?: number
           updated_at?: string
+          value?: Json | null
         }
         Relationships: []
       }
