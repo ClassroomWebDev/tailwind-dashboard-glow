@@ -459,7 +459,7 @@ function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string
     void queryClient.invalidateQueries({ queryKey: ["leaderboard-ambassadors"] });
   }
 
-  async function run(id: string, action: () => Promise<{ error: { message: string } | null }>, ok: string) {
+  async function run(id: string, action: () => PromiseLike<{ error: { message: string } | null }>, ok: string) {
     setBusy(id);
     const { error } = await action();
     setBusy(null);
