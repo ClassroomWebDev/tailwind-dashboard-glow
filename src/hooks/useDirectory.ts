@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMembers } from "@/lib/members.functions";
-import { coordinatorSalesMetrics, type CoordinatorMetrics } from "@/lib/analytics.functions";
+import {
+  coordinatorSalesMetrics,
+  ambassadorSalesMetrics,
+  type CoordinatorMetrics,
+  type AmbassadorMetrics,
+} from "@/lib/analytics.functions";
 
 export type DirectoryMember = {
   id: string;
@@ -39,6 +44,16 @@ export function useCoordinatorMetrics(seasonId: string, enabled = true) {
     queryKey: ["coordinator-metrics", seasonId],
     enabled,
     queryFn: async (): Promise<CoordinatorMetrics[]> =>
+      await fetchMetrics({ data: { season_id: seasonId || null } }),
+  });
+}
+
+export function useAmbassadorMetrics(seasonId: string, enabled = true) {
+  const fetchMetrics = useServerFn(ambassadorSalesMetrics);
+  return useQuery({
+    queryKey: ["ambassador-metrics", seasonId],
+    enabled,
+    queryFn: async (): Promise<AmbassadorMetrics[]> =>
       await fetchMetrics({ data: { season_id: seasonId || null } }),
   });
 }
