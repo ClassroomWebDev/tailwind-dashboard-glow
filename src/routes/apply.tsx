@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, CheckCircle2, Loader2, MessageCircle, Phone, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DistrictSelect } from "@/components/DistrictSelect";
-import { getApplyMeta, lookupAmbassador, submitApplication } from "@/lib/apply.functions";
+import { getApplyMeta, lookupAmbassador, submitApplication } from "@/lib/apply.client";
 import { waLink } from "@/hooks/useSupport";
+
 
 type Search = { ref?: string | undefined };
 
@@ -56,16 +56,14 @@ const EMPTY: Form = {
 
 function ApplyPage() {
   const { ref } = Route.useSearch();
-  const metaFn = useServerFn(getApplyMeta);
-  const lookupFn = useServerFn(lookupAmbassador);
-  const submitFn = useServerFn(submitApplication);
 
-  const { data: meta } = useQuery({ queryKey: ["apply-meta"], queryFn: () => metaFn({}) });
+  const { data: meta } = useQuery({ queryKey: ["apply-meta"], queryFn: () => getApplyMeta() });
   const { data: ambassador } = useQuery({
     queryKey: ["apply-ambassador", ref],
     enabled: !!ref,
-    queryFn: () => lookupFn({ data: { code: ref! } }),
+    queryFn: () => lookupAmbassador(ref!),
   });
+
 
   const [form, setForm] = useState<Form>(EMPTY);
   const [error, setError] = useState<string | null>(null);
@@ -90,16 +88,15 @@ function ApplyPage() {
 
     setSaving(true);
     try {
-      const result = await submitFn({
-        data: {
-          full_name: form.full_name.trim(),
-          mobile: form.mobile.trim(),
-          institution: form.institution.trim(),
-          facebook_link: form.facebook_link.trim(),
-          district: form.district,
-          ambassador_code: form.ambassador_code.trim(),
-        },
+      const result = await submitApplication({
+        full_name: form.full_name.trim(),
+        mobile: form.mobile.trim(),
+        institution: form.institution.trim(),
+        facebook_link: form.facebook_link.trim(),
+        district: form.district,
+        ambassador_code: form.ambassador_code.trim(),
       });
+
       if (!result.ok) setError(result.message);
       else setDone(true);
     } catch {
