@@ -88,16 +88,15 @@ function ApplyPage() {
 
     setSaving(true);
     try {
-      const result = await submitFn({
-        data: {
-          full_name: form.full_name.trim(),
-          mobile: form.mobile.trim(),
-          institution: form.institution.trim(),
-          facebook_link: form.facebook_link.trim(),
-          district: form.district,
-          ambassador_code: form.ambassador_code.trim(),
-        },
+      const result = await submitApplication({
+        full_name: form.full_name.trim(),
+        mobile: form.mobile.trim(),
+        institution: form.institution.trim(),
+        facebook_link: form.facebook_link.trim(),
+        district: form.district,
+        ambassador_code: form.ambassador_code.trim(),
       });
+
       if (!result.ok) setError(result.message);
       else setDone(true);
     } catch {
