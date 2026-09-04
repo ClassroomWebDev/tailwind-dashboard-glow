@@ -56,16 +56,14 @@ const EMPTY: Form = {
 
 function ApplyPage() {
   const { ref } = Route.useSearch();
-  const metaFn = useServerFn(getApplyMeta);
-  const lookupFn = useServerFn(lookupAmbassador);
-  const submitFn = useServerFn(submitApplication);
 
-  const { data: meta } = useQuery({ queryKey: ["apply-meta"], queryFn: () => metaFn({}) });
+  const { data: meta } = useQuery({ queryKey: ["apply-meta"], queryFn: () => getApplyMeta() });
   const { data: ambassador } = useQuery({
     queryKey: ["apply-ambassador", ref],
     enabled: !!ref,
-    queryFn: () => lookupFn({ data: { code: ref! } }),
+    queryFn: () => lookupAmbassador(ref!),
   });
+
 
   const [form, setForm] = useState<Form>(EMPTY);
   const [error, setError] = useState<string | null>(null);
