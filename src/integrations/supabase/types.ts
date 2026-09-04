@@ -1654,6 +1654,25 @@ export type Database = {
         Returns: string
       }
       next_certificate_serial: { Args: never; Returns: string }
+      public_apply_meta: {
+        Args: never
+        Returns: {
+          brand_logo_url: string
+          brand_title: string
+          helpline_whatsapp: string
+          org_helpline: string
+          season_title: string
+        }[]
+      }
+      public_lookup_ambassador: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          full_name: string
+          id: string
+          institution: string
+        }[]
+      }
       recalc_points: { Args: { _user_id: string }; Returns: undefined }
       role_prefix: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
