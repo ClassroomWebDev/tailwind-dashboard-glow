@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Users, Award, BookOpen, ArrowRight, ShieldCheck, Quote, Sparkles } from "lucide-react";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
+import { SiteFooter } from "@/components/SiteFooter";
 import { byKind, usePublishedCms } from "@/hooks/useCms";
 import { LogoBoard } from "@/components/LogoBoard";
 import { ReviewCarousel } from "@/components/ReviewCarousel";
@@ -199,12 +200,7 @@ function Homepage() {
         ) : null}
       </main>
 
-      <footer className="mt-16 border-t border-slate-200 bg-white py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-xs text-slate-500 sm:flex-row sm:px-6 lg:px-8">
-          <p>© 2026 Classroom Ambassador Program. All rights reserved.</p>
-          <span>Support Helpline: Available in User Dashboard</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
