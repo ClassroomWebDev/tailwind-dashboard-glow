@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ExternalLink } from "lucide-react";
 import type { LogoBoardRow } from "@/hooks/useEcosystem";
+import { SafeImage } from "@/components/ImageInput";
 
 
 /**
@@ -63,10 +64,9 @@ export function LogoBoard({
             <>
               <div className="flex aspect-square w-full items-center justify-center overflow-hidden">
                 {logo.logo_url ? (
-                  <img
+                  <SafeImage
                     src={logo.logo_url}
                     alt={`${logo.title} logo`}
-                    loading="lazy"
                     className="aspect-square size-full object-contain transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
