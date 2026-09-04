@@ -16,6 +16,7 @@ import { CMS_KINDS, byKind, useCmsSections, type CmsKind, type CmsSection } from
 import { CompanyWingsAdmin, LogoBoardsAdmin } from "@/components/EcosystemAdmin";
 import { ReviewsModeration } from "@/components/ReviewsModeration";
 import { BrandSettings } from "@/components/BrandSettings";
+import { ImageInput } from "@/components/ImageInput";
 
 export const Route = createFileRoute("/_authenticated/cms")({
   component: CmsPage,
@@ -181,10 +182,7 @@ function SectionCreator({ kind, nextOrder }: { kind: CmsKind; nextOrder: number 
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">Body</Label>
           <Textarea rows={3} value={body} onChange={(e) => setBody(e.target.value)} />
         </div>
-        <div className="grid gap-1.5">
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Image URL</Label>
-          <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" />
-        </div>
+        <ImageInput label="Image" value={imageUrl} onChange={setImageUrl} folder="cms" />
         <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-3">
           <div className="grid gap-1.5">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Link URL</Label>
@@ -332,10 +330,11 @@ function SectionEditor({
           onChange={(e) => setDraft({ ...draft, body: e.target.value })}
           placeholder="Body"
         />
-        <Input
+        <ImageInput
+          label="Image"
           value={draft.image_url}
-          onChange={(e) => setDraft({ ...draft, image_url: e.target.value })}
-          placeholder="Image URL"
+          onChange={(next) => setDraft({ ...draft, image_url: next })}
+          folder="cms"
         />
         <div className="grid gap-3 sm:grid-cols-2">
           <Input

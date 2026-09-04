@@ -15,6 +15,7 @@ import {
 } from "@/hooks/useContent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ImageInput } from "@/components/ImageInput";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -308,14 +309,12 @@ function EventsPage() {
                   Credited automatically to every ambassador marked present for this event.
                 </p>
               </div>
-              <div className="space-y-1.5">
-                <Label>Banner image URL</Label>
-                <Input
-                  value={draft.bannerUrl}
-                  onChange={(e) => setDraft({ ...draft, bannerUrl: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
+              <ImageInput
+                label="Banner image"
+                value={draft.bannerUrl}
+                onChange={(next) => setDraft({ ...draft, bannerUrl: next })}
+                folder="banners"
+              />
             </div>
           ) : null}
           <DialogFooter>

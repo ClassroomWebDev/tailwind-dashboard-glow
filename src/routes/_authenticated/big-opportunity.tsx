@@ -10,6 +10,7 @@ import { OpportunityCard } from "@/components/OpportunityCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { ImageInput } from "@/components/ImageInput";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -246,14 +247,13 @@ function BigOpportunityPage() {
                   onChange={(e) => setDraft({ ...draft, description: e.target.value })}
                 />
               </div>
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label>Banner / thumbnail URL</Label>
-                <Input
-                  value={draft.banner_url}
-                  placeholder="https://…"
-                  onChange={(e) => setDraft({ ...draft, banner_url: e.target.value })}
-                />
-              </div>
+              <ImageInput
+                label="Banner / thumbnail"
+                value={draft.banner_url}
+                onChange={(next) => setDraft({ ...draft, banner_url: next })}
+                folder="banners"
+                className="sm:col-span-2"
+              />
               <div className="space-y-1.5">
                 <Label>Regular price (BDT)</Label>
                 <Input

@@ -19,6 +19,7 @@ import {
   type LogoBoardRow,
   type LogoCategory,
 } from "@/hooks/useEcosystem";
+import { ImageInput, SafeImage } from "@/components/ImageInput";
 
 /* ---------------------------------- logos --------------------------------- */
 
@@ -64,17 +65,6 @@ export function LogoBoardsAdmin({ canManage }: { canManage: boolean }) {
   );
 }
 
-async function uploadLogo(file: File): Promise<string | null> {
-  const path = `logos/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g, "_")}`;
-  const { error } = await supabase.storage.from("site-assets").upload(path, file, { upsert: true });
-  if (error) {
-    toast.error(error.message);
-    return null;
-  }
-  const { data } = await supabase.storage.from("site-assets").createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
-  return data?.signedUrl ?? null;
-}
-
 function LogoCreator({ category, nextOrder }: { category: LogoCategory; nextOrder: number }) {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
@@ -82,26 +72,15 @@ function LogoCreator({ category, nextOrder }: { category: LogoCategory; nextOrde
   const [linkUrl, setLinkUrl] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function pick(file: File | undefined) {
-    if (!file) return;
-    setBusy(true);
-    const url = await uploadLogo(file);
-    setBusy(false);
-    if (url) {
-      setLogoUrl(url);
-      toast.success("Logo uploaded");
-    }
-  }
-
   async function create() {
-    if (!title.trim() || !logoUrl.trim()) {
-      toast.error("Name and logo image are required");
+    if (!logoUrl.trim()) {
+      toast.error("A logo image is required");
       return;
     }
     setBusy(true);
     const { data: userData } = await supabase.auth.getUser();
     const { error } = await supabase.from("logo_boards").insert({
-      title: title.trim(),
+      title: title.trim() || "Untitled",
       logo_url: logoUrl.trim(),
       link_url: linkUrl.trim() || null,
       category,
@@ -122,21 +101,20 @@ function LogoCreator({ category, nextOrder }: { category: LogoCategory; nextOrde
       <h3 className="font-display text-base font-semibold">Add logo</h3>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="grid gap-1.5">
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Title / Institution *</Label>
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Title / Institution</Label>
           <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
-        </div>
-        <div className="grid gap-1.5">
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Logo image URL *</Label>
-          <Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" />
         </div>
         <div className="grid gap-1.5">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">Website link</Label>
           <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://…" />
         </div>
-        <div className="grid gap-1.5 sm:col-span-2 lg:col-span-3">
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground">…or upload an image</Label>
-          <Input type="file" accept="image/*" onChange={(e) => void pick(e.target.files?.[0])} />
-        </div>
+        <ImageInput
+          label="Logo image *"
+          value={logoUrl}
+          onChange={setLogoUrl}
+          folder="logos"
+          className="sm:col-span-2 lg:col-span-3"
+        />
       </div>
       <Button className="mt-5" onClick={() => void create()} disabled={busy}>
         {busy ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />} Add logo
@@ -186,7 +164,7 @@ function LogoEditor({ row, canManage }: { row: LogoBoardRow; canManage: boolean 
     <article className="rounded-3xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-background p-2">
-          <img src={row.logo_url} alt={row.title} className="max-h-full max-w-full object-contain" />
+          <SafeImage src={row.logo_url} alt={row.title} className="max-h-full max-w-full object-contain" />
         </div>
         <div className="min-w-0">
           <p className="truncate font-semibold">{row.title}</p>
@@ -197,10 +175,11 @@ function LogoEditor({ row, canManage }: { row: LogoBoardRow; canManage: boolean 
         <>
           <div className="mt-4 grid gap-3">
             <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Title" />
-            <Input
+            <ImageInput
+              label="Logo image"
               value={draft.logo_url}
-              onChange={(e) => setDraft({ ...draft, logo_url: e.target.value })}
-              placeholder="Logo URL"
+              onChange={(next) => setDraft({ ...draft, logo_url: next })}
+              folder="logos"
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <Input
@@ -351,10 +330,12 @@ function WingFields({
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">Email</Label>
         <Input value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} maxLength={160} />
       </div>
-      <div className="grid gap-1.5">
-        <Label className="text-xs uppercase tracking-wide text-muted-foreground">Logo URL</Label>
-        <Input value={draft.logo_url} onChange={(e) => setDraft({ ...draft, logo_url: e.target.value })} />
-      </div>
+      <ImageInput
+        label="Logo image"
+        value={draft.logo_url}
+        onChange={(next) => setDraft({ ...draft, logo_url: next })}
+        folder="wings"
+      />
       <div className="grid gap-1.5">
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">Display order</Label>
         <Input
