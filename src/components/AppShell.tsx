@@ -39,6 +39,7 @@ type NavItem = {
     | "/sales"
     | "/opportunities/create"
     | "/opportunities/history"
+    | "/opportunity-seeker"
     | "/leaderboard"
     | "/users"
     | "/notices"
