@@ -7,6 +7,7 @@ import { HoldModal, readHoldNotice, type HoldNotice } from "@/components/HoldMod
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DEFAULT_SITE_SETTINGS, useSiteSettings } from "@/hooks/useSiteSettings";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -42,6 +43,8 @@ const mobileSchema = z
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { data: site } = useSiteSettings();
+  const copy = site?.auth ?? DEFAULT_SITE_SETTINGS.auth;
   const [mode, setMode] = useState<Mode>("login");
   const [hold, setHold] = useState<HoldNotice | null>(null);
   const [busy, setBusy] = useState(false);
@@ -111,17 +114,10 @@ function AuthPage() {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="hidden flex-col justify-between bg-surface-dark p-12 text-surface-dark-foreground lg:flex">
-        <span className="font-display text-lg font-semibold">Ambassador Hub</span>
+        <span className="font-display text-lg font-semibold">{copy.heading}</span>
         <div>
-          <h2 className="font-display text-4xl font-bold leading-tight">
-            One profile.
-            <br />
-            One support line.
-          </h2>
-          <p className="mt-4 max-w-sm text-sm text-surface-dark-foreground/70">
-            Keep your member profile at 100% and stay connected with your coordinator, mentor and
-            support manager.
-          </p>
+          <h2 className="font-display text-4xl font-bold leading-tight">{copy.title}</h2>
+          <p className="mt-4 max-w-sm text-sm text-surface-dark-foreground/70">{copy.subtitle}</p>
         </div>
         <p className="text-xs text-surface-dark-foreground/50">Policy compliant member access</p>
       </div>
