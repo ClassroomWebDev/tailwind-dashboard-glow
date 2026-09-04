@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedNoticesRouteImport } from './routes/_authenticated/notices'
+import { Route as AuthenticatedOpportunitySeekerRouteImport } from './routes/_authenticated/opportunity-seeker'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedReviewsRouteImport } from './routes/_authenticated/reviews'
 import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/sales'
@@ -116,6 +117,12 @@ const AuthenticatedNoticesRoute = AuthenticatedNoticesRouteImport.update({
   path: '/notices',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOpportunitySeekerRoute =
+  AuthenticatedOpportunitySeekerRouteImport.update({
+    id: '/opportunity-seeker',
+    path: '/opportunity-seeker',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -175,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof AuthenticatedEventsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/notices': typeof AuthenticatedNoticesRoute
+  '/opportunity-seeker': typeof AuthenticatedOpportunitySeekerRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reviews': typeof AuthenticatedReviewsRoute
   '/sales': typeof AuthenticatedSalesRoute
@@ -200,6 +208,7 @@ export interface FileRoutesByTo {
   '/events': typeof AuthenticatedEventsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/notices': typeof AuthenticatedNoticesRoute
+  '/opportunity-seeker': typeof AuthenticatedOpportunitySeekerRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reviews': typeof AuthenticatedReviewsRoute
   '/sales': typeof AuthenticatedSalesRoute
@@ -227,6 +236,7 @@ export interface FileRoutesById {
   '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/notices': typeof AuthenticatedNoticesRoute
+  '/_authenticated/opportunity-seeker': typeof AuthenticatedOpportunitySeekerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/reviews': typeof AuthenticatedReviewsRoute
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/leaderboard'
     | '/notices'
+    | '/opportunity-seeker'
     | '/profile'
     | '/reviews'
     | '/sales'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/leaderboard'
     | '/notices'
+    | '/opportunity-seeker'
     | '/profile'
     | '/reviews'
     | '/sales'
@@ -305,6 +317,7 @@ export interface FileRouteTypes {
     | '/_authenticated/events'
     | '/_authenticated/leaderboard'
     | '/_authenticated/notices'
+    | '/_authenticated/opportunity-seeker'
     | '/_authenticated/profile'
     | '/_authenticated/reviews'
     | '/_authenticated/sales'
@@ -437,6 +450,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNoticesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/opportunity-seeker': {
+      id: '/_authenticated/opportunity-seeker'
+      path: '/opportunity-seeker'
+      fullPath: '/opportunity-seeker'
+      preLoaderRoute: typeof AuthenticatedOpportunitySeekerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -508,6 +528,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedNoticesRoute: typeof AuthenticatedNoticesRoute
+  AuthenticatedOpportunitySeekerRoute: typeof AuthenticatedOpportunitySeekerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReviewsRoute: typeof AuthenticatedReviewsRoute
   AuthenticatedSalesRoute: typeof AuthenticatedSalesRoute
@@ -530,6 +551,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedNoticesRoute: AuthenticatedNoticesRoute,
+  AuthenticatedOpportunitySeekerRoute: AuthenticatedOpportunitySeekerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReviewsRoute: AuthenticatedReviewsRoute,
   AuthenticatedSalesRoute: AuthenticatedSalesRoute,
