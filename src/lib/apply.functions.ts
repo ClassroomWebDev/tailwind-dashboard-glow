@@ -113,6 +113,12 @@ export const submitApplication = createServerFn({ method: "POST" })
     });
 
     if (error) {
+      console.error("[apply] application insert failed", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
       if (error.code === "23505") return { ok: false, message: duplicateMessage };
       return { ok: false, message: "We could not submit your application. Please try again." };
     }

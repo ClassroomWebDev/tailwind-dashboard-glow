@@ -21,6 +21,7 @@ import {
   Trophy,
   Users,
   UserRoundCog,
+  UserSearch,
   Star,
   Info,
   X,
@@ -39,6 +40,7 @@ type NavItem = {
     | "/sales"
     | "/opportunities/create"
     | "/opportunities/history"
+    | "/opportunity-seeker"
     | "/leaderboard"
     | "/users"
     | "/notices"
@@ -78,6 +80,7 @@ function navForRole(role: AppRole | undefined): NavItem[] {
   const courses: NavItem = { to: "/courses", label: "Courses", icon: BookOpen };
   const opportunityCreate: NavItem = { to: "/opportunities/create", label: "Opportunity Create", icon: FilePlus2 };
   const opportunityHistory: NavItem = { to: "/opportunities/history", label: "Opportunities History", icon: History };
+  const opportunitySeeker: NavItem = { to: "/opportunity-seeker", label: "Opportunity Seeker", icon: UserSearch };
 
   const attendance: NavItem = { to: "/attendance", label: "Attendance Log", icon: CalendarCheck };
   const myOpportunities = (badge: boolean): NavItem =>
@@ -86,7 +89,13 @@ function navForRole(role: AppRole | undefined): NavItem[] {
       : { to: "/sales", label: "My Opportunities", icon: ReceiptText };
 
   // Group 1 — overview | Group 2 — opportunities | Group 3 — programme | Group 4 — organisation
-  const group2 = (badge: boolean) => [myOpportunities(badge), bigOpportunity, opportunityCreate, opportunityHistory];
+  const group2 = (badge: boolean) => [
+    myOpportunities(badge),
+    bigOpportunity,
+    opportunityCreate,
+    opportunityHistory,
+    opportunitySeeker,
+  ];
   const group4 = [branding, notices, about, support, profile];
 
   if (role === "admin" || role === "support_manager") {

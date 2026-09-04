@@ -19,6 +19,8 @@ export type Database = {
           ambassador_code: string | null
           ambassador_id: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           district: string
           facebook_link: string | null
           full_name: string
@@ -33,6 +35,8 @@ export type Database = {
           ambassador_code?: string | null
           ambassador_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           district: string
           facebook_link?: string | null
           full_name: string
@@ -47,6 +51,8 @@ export type Database = {
           ambassador_code?: string | null
           ambassador_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           district?: string
           facebook_link?: string | null
           full_name?: string
