@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Facebook, Linkedin, Mail, MapPin, Youtube } from "lucide-react";
 
 const QUICK_LINKS: { label: string; to: string }[] = [
-  { label: "Opportunities", to: "/opportunities" },
+  { label: "Opportunities", to: "/sales" },
   { label: "Campus Ambassador Program", to: "/apply" },
   { label: "Verification", to: "/certificates" },
   { label: "Notice Board", to: "/notices" },
@@ -84,12 +84,12 @@ export function SiteFooter() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs text-slate-400 sm:flex-row sm:px-6 lg:px-8">
           <p>© {year} Classroom Bangladesh. All rights reserved.</p>
           <div className="flex gap-5">
-            <a href="/privacy" className="transition-colors hover:text-white">
+            <Link to="/about" className="transition-colors hover:text-white">
               Privacy Policy
-            </a>
-            <a href="/terms" className="transition-colors hover:text-white">
+            </Link>
+            <Link to="/about" className="transition-colors hover:text-white">
               Terms
-            </a>
+            </Link>
           </div>
         </div>
       </div>
