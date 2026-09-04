@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, CheckCircle2, Loader2, MessageCircle, Phone, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DistrictSelect } from "@/components/DistrictSelect";
-import { getApplyMeta, lookupAmbassador, submitApplication } from "@/lib/apply.functions";
+import { getApplyMeta, lookupAmbassador, submitApplication } from "@/lib/apply.client";
 import { waLink } from "@/hooks/useSupport";
+
 
 type Search = { ref?: string | undefined };
 
