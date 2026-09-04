@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DistrictSelect } from "@/components/DistrictSelect";
-import { getApplyMeta, lookupAmbassador, submitApplication } from "@/lib/apply.client";
+import { getApplyMeta, lookupAmbassador, submitApplication } from "@/lib/apply-public";
 import { waLink } from "@/hooks/useSupport";
 
 
