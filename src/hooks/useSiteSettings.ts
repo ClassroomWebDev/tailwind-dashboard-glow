@@ -9,11 +9,31 @@ export type BrandSettingsValue = {
   favicon_url: string;
 };
 
+export type TextSize = "sm" | "md" | "lg" | "xl";
+
 export type AuthCopyValue = {
   heading: string;
   title: string;
   subtitle: string;
+  left_logo_url: string;
+  left_logo_height: number;
+  left_title_size: TextSize;
+  left_body_size: TextSize;
+  bottom_text: string;
+  right_logo_url: string;
+  right_logo_height: number;
+  helpline_text: string;
+  helpline_phone: string;
 };
+
+export type PopupValue = {
+  enabled: boolean;
+  image_url: string;
+  title: string;
+  description: string;
+  helpline: string;
+};
+
 
 export type HeaderValue = {
   logo_url: string;
