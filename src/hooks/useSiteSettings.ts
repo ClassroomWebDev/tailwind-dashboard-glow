@@ -32,12 +32,16 @@ export type PopupValue = {
   title: string;
   description: string;
   helpline: string;
+  /** Modal max width in pixels (400–1000). */
+  max_width: number;
 };
 
 
 export type HeaderValue = {
   logo_url: string;
   logo_height: number;
+  sidebar_logo_url: string;
+  sidebar_logo_height: number;
   show_brand_text: boolean;
   brand_title: string;
   brand_tagline: string;
