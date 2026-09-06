@@ -104,6 +104,7 @@ export function useSiteSettings() {
       const merged: SiteSettings = {
         brand: { ...DEFAULT_SITE_SETTINGS.brand },
         auth: { ...DEFAULT_SITE_SETTINGS.auth },
+        header: { ...DEFAULT_SITE_SETTINGS.header },
         footer: { ...DEFAULT_SITE_SETTINGS.footer },
       };
       for (const row of data ?? []) {
