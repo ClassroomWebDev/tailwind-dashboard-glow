@@ -70,6 +70,8 @@ function CmsPage() {
             <TabsTrigger value="header">Header / Logo</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="login">Login Page</TabsTrigger>
+            <TabsTrigger value="popup">Post-Login Popup</TabsTrigger>
+
           </TabsList>
           <TabsContent value="identity" className="mt-6">
             <SiteIdentityAdmin />
