@@ -100,11 +100,17 @@ export function OpportunityCard({
   item,
   outlineOpen,
   onToggleOutline,
+  runningBatches = [],
+  showCoordinatorTier = true,
   children,
 }: {
   item: OpportunityItem;
   outlineOpen: boolean;
   onToggleOutline: () => void;
+  /** Names of batches currently running — rendered as black tags beside the title. */
+  runningBatches?: string[];
+  /** Ambassadors never see the coordinator fee tier. */
+  showCoordinatorTier?: boolean;
   /** Extra actions (admin controls, apply button) rendered in the card footer. */
   children?: React.ReactNode;
 }) {
@@ -141,6 +147,21 @@ export function OpportunityCard({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-display text-xl font-bold leading-tight">{item.title}</h3>
+              {runningBatches.length > 0 ? (
+                <>
+                  <span className="rounded-md bg-brand-red px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-brand-red-foreground">
+                    Batch Running
+                  </span>
+                  {runningBatches.map((name) => (
+                    <span
+                      key={name}
+                      className="rounded-md bg-foreground px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-background"
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </>
+              ) : null}
               {item.hasCertificate ? (
                 <Badge variant="outline" className="border-primary/40 text-primary">
                   Certificate Included
@@ -151,6 +172,7 @@ export function OpportunityCard({
               {item.tag}
             </Badge>
           </div>
+
           {item.description ? (
             <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{item.description}</p>
           ) : null}
