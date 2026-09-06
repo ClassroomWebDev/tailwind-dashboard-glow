@@ -417,6 +417,8 @@ function MyAttendanceLog() {
             </tbody>
           </table>
         </div>
+        <TablePagination pagination={pagination} label="classes" />
+        </div>
       )}
     </section>
   );
