@@ -11,10 +11,12 @@ export function SafeImage({
   src,
   alt,
   className,
+  style,
 }: {
   src?: string | null;
   alt: string;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const [broken, setBroken] = useState(false);
   const url = src ? sanitizeImageUrl(src) : "";
@@ -24,6 +26,7 @@ export function SafeImage({
       alt={alt}
       loading="lazy"
       onError={() => setBroken(true)}
+      {...(style ? { style } : {})}
       {...(className ? { className } : {})}
     />
   );
