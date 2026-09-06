@@ -169,7 +169,7 @@ function Kpis({ rows }: { rows: Sale[] }) {
           <p className="mt-2 font-display text-2xl font-bold" style={{ color: BRAND_RED }}>
             {money(c.amount)}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{c.count} opportunities</p>
+          <p className="mt-1 text-xs text-muted-foreground">{c.count} approved opportunities</p>
         </article>
       ))}
     </section>
