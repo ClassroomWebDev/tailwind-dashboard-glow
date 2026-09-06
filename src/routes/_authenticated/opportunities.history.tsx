@@ -293,7 +293,7 @@ function ScopedTable({
 }) {
   const courseName = useCourseName();
   const [term, setTerm] = useState("");
-  const sorted = useMemo(() => newestFirst(rows as unknown as Record<string, unknown>[]) as unknown as Sale[], [rows]);
+  const sorted = useMemo(() => newestFirst(rows), [rows]);
   const filtered = useMemo(() => sorted.filter((s) => matchesSale(s, term, courseName(s))), [sorted, term, courseName]);
   const pagination = usePagination(filtered);
 
