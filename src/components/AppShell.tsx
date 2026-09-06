@@ -13,6 +13,7 @@ import {
   LifeBuoy,
   LogOut,
   Megaphone,
+  Heart,
   Share2,
   Rocket,
   Menu,
@@ -89,13 +90,16 @@ function navForRole(role: AppRole | undefined): NavItem[] {
 
   const courses: NavItem = { to: "/courses", label: "Courses", icon: BookOpen };
   const opportunityCreate: NavItem = { to: "/opportunities/create", label: "Opportunity Create", icon: FilePlus2 };
-  const opportunityHistory: NavItem = { to: "/opportunities/history", label: "Opportunities History", icon: History };
+  const opportunityHistory = (badge: boolean): NavItem =>
+    badge
+      ? { to: "/opportunities/history", label: "Opportunities History", icon: History, badge: "pending-sales" }
+      : { to: "/opportunities/history", label: "Opportunities History", icon: History };
   const opportunitySeeker: NavItem = { to: "/opportunity-seeker", label: "Opportunity Seeker", icon: UserSearch };
 
   const attendance: NavItem = { to: "/attendance", label: "Attendance Log", icon: CalendarCheck };
   const myOpportunities = (badge: boolean): NavItem =>
     badge
-      ? { to: "/sales", label: "My Opportunities", icon: ReceiptText, badge: "pending-sales" }
+      ? { to: "/sales", label: "My Opportunities", icon: ReceiptText }
       : { to: "/sales", label: "My Opportunities", icon: ReceiptText };
 
   // Group 1 — overview | Group 2 — opportunities | Group 3 — programme | Group 4 — organisation
@@ -103,10 +107,10 @@ function navForRole(role: AppRole | undefined): NavItem[] {
     myOpportunities(badge),
     bigOpportunity,
     opportunityCreate,
-    opportunityHistory,
+    opportunityHistory(badge),
     opportunitySeeker,
   ];
-  const group4 = [branding, notices, about, support, profile];
+  const group4 = [successStory, branding, notices, about, support, profile];
 
   if (role === "admin" || role === "support_manager") {
     return [
