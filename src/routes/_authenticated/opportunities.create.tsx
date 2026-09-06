@@ -92,7 +92,6 @@ function OpportunityEntry() {
   const [studentInstitution, setStudentInstitution] = useState("");
   const [studentDistrict, setStudentDistrict] = useState("");
   const [gatewayId, setGatewayId] = useState("");
-  const [senderAccount, setSenderAccount] = useState("");
   const [proofUrl, setProofUrl] = useState("");
   const [orderNo, setOrderNo] = useState("");
   const [paymentRef, setPaymentRef] = useState("");
@@ -143,7 +142,6 @@ function OpportunityEntry() {
     setStudentInstitution("");
     setStudentDistrict("");
     setGatewayId("");
-    setSenderAccount("");
     setProofUrl("");
     setOrderNo("");
     setPaymentRef("");
@@ -198,7 +196,7 @@ function OpportunityEntry() {
       payment_method: gatewayLabel(gateway),
       payment_gateway_id: gateway.id,
       payment_account_number: gateway.account_number,
-      sender_account: senderAccount.trim() || null,
+      sender_account: paymentRef.trim() || null,
       payment_proof_url: proofUrl.trim() || null,
       order_no: orderNo.trim(),
       payment_ref: paymentRef.trim() || null,
@@ -223,7 +221,7 @@ function OpportunityEntry() {
   return (
     <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
       <h2 className="font-display text-xl font-semibold">Opportunity Create</h2>
-      <div className="mt-6 grid gap-5 sm:grid-cols-2">
+      <div className="mt-6 grid items-start gap-5 sm:grid-cols-2">
         <div className="grid gap-1.5 sm:col-span-2">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Opportunity *
@@ -416,22 +414,14 @@ function OpportunityEntry() {
           </div>
         ) : null}
 
-        <div className="grid gap-1.5">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Sender account number
-          </Label>
-          <Input
-            value={senderAccount}
-            onChange={(e) => setSenderAccount(e.target.value)}
-            placeholder="Number the payment was sent from"
+        <div className="sm:col-span-2">
+          <ImageInput
+            label="Payment proof / receipt (optional)"
+            folder="payments"
+            value={proofUrl}
+            onChange={setProofUrl}
           />
         </div>
-        <ImageInput
-          label="Payment proof / receipt (optional)"
-          folder="payments"
-          value={proofUrl}
-          onChange={setProofUrl}
-        />
         <div className="grid gap-1.5 sm:col-span-2">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Notes / remarks</Label>
           <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />

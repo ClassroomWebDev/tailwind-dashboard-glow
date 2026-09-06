@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Award, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Award, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { ImageInput } from "@/components/ImageInput";
+import { swapDisplayOrder } from "@/lib/display-order";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRole } from "@/hooks/useProfile";
 import { isStaffRole, useCourses, useSessions, type Course } from "@/hooks/useBusiness";
@@ -45,6 +47,8 @@ type CourseForm = {
   start_date: string;
   end_date: string;
   has_certificate: boolean;
+  thumbnail_url: string;
+  display_order: string;
   regular_price: string;
   student_price: string;
   coordinator_price: string;
@@ -62,6 +66,8 @@ const EMPTY: CourseForm = {
   start_date: "",
   end_date: "",
   has_certificate: false,
+  thumbnail_url: "",
+  display_order: "0",
   regular_price: "0",
   student_price: "0",
   coordinator_price: "0",
@@ -124,6 +130,8 @@ function CoursesPage() {
       start_date: c.start_date ?? "",
       end_date: c.end_date ?? "",
       has_certificate: c.has_certificate,
+      thumbnail_url: c.thumbnail_url ?? "",
+      display_order: String(c.display_order ?? 0),
       regular_price: String(c.regular_price),
       student_price: String(c.student_price),
       coordinator_price: String(c.coordinator_price),
@@ -153,6 +161,8 @@ function CoursesPage() {
       start_date: form.start_date || null,
       end_date: form.end_date || null,
       has_certificate: form.has_certificate,
+      thumbnail_url: form.thumbnail_url.trim() || null,
+      display_order: Number(form.display_order) || 0,
       regular_price: Number(form.regular_price) || 0,
       student_price: Number(form.student_price) || 0,
       coordinator_price: Number(form.coordinator_price) || 0,
@@ -186,6 +196,22 @@ function CoursesPage() {
       setEditingId(null);
     }
     void queryClient.invalidateQueries({ queryKey: ["courses"] });
+  }
+
+  /** Manual catalogue sequence control for admins and managers. */
+  async function move(list: Course[], from: number, to: number) {
+    try {
+      await swapDisplayOrder(
+        "courses",
+        "display_order",
+        list.map((c) => ({ id: c.id, order: Number(c.display_order ?? 0) })),
+        from,
+        to,
+      );
+      void queryClient.invalidateQueries({ queryKey: ["courses"] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not reorder");
+    }
   }
 
   async function remove(id: string) {
@@ -280,6 +306,21 @@ function CoursesPage() {
             <Field label="Details" className="sm:col-span-2">
               <Textarea rows={3} value={form.details} onChange={(e) => set("details", e.target.value)} />
             </Field>
+            <ImageInput
+              label="Course thumbnail (16:9, optional)"
+              value={form.thumbnail_url}
+              onChange={(next) => set("thumbnail_url", next)}
+              folder="course-thumbnails"
+              className="sm:col-span-2"
+            />
+            <Field label="Display order (lower shows first)">
+              <Input
+                type="number"
+                min={0}
+                value={form.display_order}
+                onChange={(e) => set("display_order", e.target.value)}
+              />
+            </Field>
             <Field label="Schedule start date">
               <Input type="date" value={form.start_date} onChange={(e) => set("start_date", e.target.value)} />
             </Field>
@@ -363,6 +404,7 @@ function CoursesPage() {
               completed: withProgress.filter((x) => x.progress.lifecycle === "completed"),
               upcoming: withProgress.filter((x) => x.progress.lifecycle === "upcoming"),
             };
+            const ordered = withProgress.map((x) => x.course);
             const renderCard = ({ course: c, progress }: (typeof withProgress)[number]) => (
               <article key={c.id} className="rounded-3xl border border-border bg-card p-6 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -439,7 +481,29 @@ function CoursesPage() {
 
                 {staff ? (
                   <>
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={ordered.findIndex((x) => x.id === c.id) === 0}
+                        onClick={() => {
+                          const i = ordered.findIndex((x) => x.id === c.id);
+                          void move(ordered, i, i - 1);
+                        }}
+                      >
+                        <ArrowUp className="size-3.5" /> Up
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={ordered.findIndex((x) => x.id === c.id) === ordered.length - 1}
+                        onClick={() => {
+                          const i = ordered.findIndex((x) => x.id === c.id);
+                          void move(ordered, i, i + 1);
+                        }}
+                      >
+                        <ArrowDown className="size-3.5" /> Down
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => startEdit(c)}>
                         <Pencil className="size-3.5" /> Edit
                       </Button>

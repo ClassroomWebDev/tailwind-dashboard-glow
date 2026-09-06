@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ExternalLink, Loader2, Plus, Rocket, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ExternalLink, Loader2, Plus, Rocket, Trash2 } from "lucide-react";
+import { swapDisplayOrder } from "@/lib/display-order";
 import { supabase } from "@/integrations/supabase/client";
 import { useBigOpportunities, type BigOpportunity } from "@/hooks/useBigOpportunities";
 import { useMyRole } from "@/hooks/useProfile";
@@ -47,6 +48,7 @@ type Draft = {
   title: string;
   description: string;
   banner_url: string;
+  thumbnail_url: string;
   price: string;
   regular_price: string;
   student_price: string;
@@ -63,6 +65,7 @@ const EMPTY: Draft = {
   title: "",
   description: "",
   banner_url: "",
+  thumbnail_url: "",
   price: "0",
   regular_price: "0",
   student_price: "0",
@@ -97,6 +100,7 @@ function BigOpportunityPage() {
       title: draft.title.trim(),
       description: draft.description.trim() || null,
       banner_url: draft.banner_url.trim() || null,
+      thumbnail_url: draft.thumbnail_url.trim() || null,
       price: Number(draft.price) || 0,
       regular_price: Number(draft.regular_price) || 0,
       student_price: Number(draft.student_price) || 0,
@@ -121,6 +125,22 @@ function BigOpportunityPage() {
     void refresh();
   }
 
+  /** Manual display sequence control for admins and managers. */
+  async function move(list: BigOpportunity[], from: number, to: number) {
+    try {
+      await swapDisplayOrder(
+        "big_opportunities",
+        "sort_order",
+        list.map((p) => ({ id: p.id, order: Number(p.sort_order ?? 0) })),
+        from,
+        to,
+      );
+      void refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not reorder");
+    }
+  }
+
   async function remove(id: string) {
     const { error } = await supabase.from("big_opportunities").delete().eq("id", id);
     if (error) {
@@ -137,6 +157,7 @@ function BigOpportunityPage() {
       title: p.title,
       description: p.description ?? "",
       banner_url: p.banner_url ?? "",
+      thumbnail_url: p.thumbnail_url ?? "",
       price: String(p.price ?? 0),
       regular_price: String(p.regular_price ?? 0),
       student_price: String(p.student_price ?? 0),
@@ -178,7 +199,7 @@ function BigOpportunityPage() {
         </div>
       ) : (
         <div className="flex flex-col">
-          {(programmes ?? []).filter(Boolean).map((p) => (
+          {(programmes ?? []).filter(Boolean).map((p, index, list) => (
             <OpportunityCard
               key={p.id}
               item={{
@@ -186,6 +207,7 @@ function BigOpportunityPage() {
                 title: p.title ?? "Untitled programme",
                 description: p.description ?? null,
                 bannerUrl: p.banner_url ?? null,
+                thumbnailUrl: p.thumbnail_url ?? null,
                 tag: p.is_active ? "Big Opportunity" : "Inactive",
                 regular: Number(p.regular_price || p.price || 0),
                 student: Number(p.student_price || p.price || 0),
@@ -211,6 +233,24 @@ function BigOpportunityPage() {
               ) : null}
               {canManage ? (
                 <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={index === 0}
+                    onClick={() => void move(list, index, index - 1)}
+                    aria-label="Move up"
+                  >
+                    <ArrowUp className="size-4" /> Up
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={index === list.length - 1}
+                    onClick={() => void move(list, index, index + 1)}
+                    aria-label="Move down"
+                  >
+                    <ArrowDown className="size-4" /> Down
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => edit(p)}>
                     Edit
                   </Button>
@@ -248,7 +288,14 @@ function BigOpportunityPage() {
                 />
               </div>
               <ImageInput
-                label="Banner / thumbnail"
+                label="Course thumbnail (16:9)"
+                value={draft.thumbnail_url}
+                onChange={(next) => setDraft({ ...draft, thumbnail_url: next })}
+                folder="course-thumbnails"
+                className="sm:col-span-2"
+              />
+              <ImageInput
+                label="Banner (optional)"
                 value={draft.banner_url}
                 onChange={(next) => setDraft({ ...draft, banner_url: next })}
                 folder="banners"

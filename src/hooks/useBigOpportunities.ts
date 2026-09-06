@@ -9,7 +9,7 @@ export function useBigOpportunities(activeOnly = false) {
   return useQuery({
     queryKey: ["big-opportunities", activeOnly],
     queryFn: async (): Promise<BigOpportunity[]> => {
-      let query = supabase.from("big_opportunities").select("*").order("sort_order").order("title");
+      let query = supabase.from("big_opportunities").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false });
       if (activeOnly) query = query.eq("is_active", true);
       const { data, error } = await query;
       if (error) throw error;

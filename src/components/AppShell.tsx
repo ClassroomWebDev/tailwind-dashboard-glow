@@ -15,6 +15,7 @@ import {
   Megaphone,
   Heart,
   Share2,
+  ShieldAlert,
   Rocket,
   Menu,
   ReceiptText,
@@ -59,6 +60,7 @@ type NavItem = {
     | "/profile"
     | "/support"
     | "/branding"
+    | "/system-reset"
     | "/big-opportunity"
     | "/about";
   label: string;
@@ -130,6 +132,9 @@ function navForRole(role: AppRole | undefined): NavItem[] {
       { to: "/seasons", label: "Seasons", icon: Timer },
       { to: "/cms", label: "Website CMS", icon: LayoutTemplate },
       { to: "/users", label: "Users", icon: Users },
+      ...(role === "admin"
+        ? [{ to: "/system-reset" as const, label: "System Reset", icon: ShieldAlert }]
+        : []),
     ];
   }
 
