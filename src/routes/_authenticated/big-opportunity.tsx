@@ -199,7 +199,14 @@ function BigOpportunityPage() {
         </div>
       ) : (
         <div className="flex flex-col">
-          {(programmes ?? []).filter(Boolean).map((p, index, list) => (
+          <div className="mb-4">
+            <CatalogFilterTabs value={filter} onChange={setFilter} />
+          </div>
+          {(programmes ?? [])
+            .filter(Boolean)
+            .filter((p) => (filter === "running" ? p.is_active : filter === "upcoming" ? !p.is_active : true))
+            .map((p, index, list) => (
+
             <OpportunityCard
               key={p.id}
               item={{
