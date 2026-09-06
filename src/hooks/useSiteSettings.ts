@@ -64,6 +64,22 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     subtitle:
       "Keep your member profile at 100% and stay connected with your coordinator, mentor and support manager.",
   },
+  header: {
+    logo_url: "",
+    logo_height: 48,
+    show_brand_text: true,
+    brand_title: "Classroom Ambassador",
+    brand_tagline: "Empowering Campus Leaders",
+    nav_links: [],
+    show_login: true,
+    login_label: "Sign In",
+    show_register: false,
+    register_label: "Register",
+    register_url: "/apply",
+    show_contact: false,
+    contact_label: "Contact Us",
+    contact_url: "/about",
+  },
   footer: {
     brand_title: "Classroom Bangladesh",
     logo_url: "",
