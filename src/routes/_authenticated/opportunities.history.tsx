@@ -555,8 +555,24 @@ function GovRows({
                   </td>
                   <td className="px-4 py-3 font-medium">{money(Number(s.amount))}</td>
                   <td className="px-4 py-3">
-                    {s.payment_method}
-                    <span className="block text-xs text-muted-foreground">{s.payment_ref ?? "—"}</span>
+                    <span className="font-medium">{s.payment_method}</span>
+                    {s.payment_account_number ? (
+                      <span className="block text-xs text-muted-foreground">To: {s.payment_account_number}</span>
+                    ) : null}
+                    {s.sender_account ? (
+                      <span className="block text-xs text-muted-foreground">From: {s.sender_account}</span>
+                    ) : null}
+                    <span className="block text-xs text-muted-foreground">TrxID: {s.payment_ref ?? "—"}</span>
+                    {s.payment_proof_url ? (
+                      <a
+                        href={s.payment_proof_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-block text-xs font-semibold text-primary underline underline-offset-2"
+                      >
+                        View receipt
+                      </a>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">{nameWithId(amb)}</td>
                   <td className="px-4 py-3">{coord ? nameWithId(coord) : "Unassigned"}</td>
