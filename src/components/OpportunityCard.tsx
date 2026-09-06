@@ -1,14 +1,17 @@
-import { CalendarDays, Clock, ExternalLink, Users2 } from "lucide-react";
+import { CalendarDays, Clock, ExternalLink, ImageIcon, Users2 } from "lucide-react";
 import { useBatches } from "@/hooks/useBatches";
 import { Badge } from "@/components/ui/badge";
 import { CourseOutlineViewer } from "@/components/CourseOutlineViewer";
 import { formatDate, formatTime } from "@/lib/format";
+import { sanitizeImageUrl } from "@/lib/images";
 
 export type OpportunityItem = {
   key: string;
   title: string;
   description?: string | null;
   bannerUrl?: string | null;
+  /** 16:9 catalogue thumbnail; falls back to the banner, then a branded placeholder. */
+  thumbnailUrl?: string | null;
   tag: string;
   regular: number;
   student: number;
@@ -25,6 +28,7 @@ export type OpportunityItem = {
 };
 
 const money = (v: number) => (Number(v) > 0 ? `৳${Number(v).toLocaleString("en-US")}` : "Free");
+
 
 /** Discount vs the regular fee, rounded to a whole percent. */
 function scholarship(regular: number, price: number) {
