@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ExternalLink, Loader2, Plus, Rocket, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ExternalLink, Loader2, Plus, Rocket, Trash2 } from "lucide-react";
+import { swapDisplayOrder } from "@/lib/display-order";
 import { supabase } from "@/integrations/supabase/client";
 import { useBigOpportunities, type BigOpportunity } from "@/hooks/useBigOpportunities";
 import { useMyRole } from "@/hooks/useProfile";
@@ -124,6 +125,22 @@ function BigOpportunityPage() {
     void refresh();
   }
 
+  /** Manual display sequence control for admins and managers. */
+  async function move(list: BigOpportunity[], from: number, to: number) {
+    try {
+      await swapDisplayOrder(
+        "big_opportunities",
+        "sort_order",
+        list.map((p) => ({ id: p.id, order: Number(p.sort_order ?? 0) })),
+        from,
+        to,
+      );
+      void refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not reorder");
+    }
+  }
+
   async function remove(id: string) {
     const { error } = await supabase.from("big_opportunities").delete().eq("id", id);
     if (error) {
@@ -182,7 +199,7 @@ function BigOpportunityPage() {
         </div>
       ) : (
         <div className="flex flex-col">
-          {(programmes ?? []).filter(Boolean).map((p) => (
+          {(programmes ?? []).filter(Boolean).map((p, index, list) => (
             <OpportunityCard
               key={p.id}
               item={{
@@ -216,6 +233,24 @@ function BigOpportunityPage() {
               ) : null}
               {canManage ? (
                 <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={index === 0}
+                    onClick={() => void move(list, index, index - 1)}
+                    aria-label="Move up"
+                  >
+                    <ArrowUp className="size-4" /> Up
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={index === list.length - 1}
+                    onClick={() => void move(list, index, index + 1)}
+                    aria-label="Move down"
+                  >
+                    <ArrowDown className="size-4" /> Down
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => edit(p)}>
                     Edit
                   </Button>
