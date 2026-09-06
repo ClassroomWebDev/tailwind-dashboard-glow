@@ -91,8 +91,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     bottom_text: "Policy compliant member access",
     right_logo_url: "",
     right_logo_height: 40,
-    helpline_text:
-      "লগইন করতে কোনো সমস্যা হলে আমাদের হেল্পলাইনে যোগাযোগ করুন / Having trouble signing in? Contact our helpline:",
+    helpline_text: "Having trouble signing in? Contact our helpline:",
     helpline_phone: "",
   },
   popup: {
