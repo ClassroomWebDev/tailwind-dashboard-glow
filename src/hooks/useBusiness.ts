@@ -24,7 +24,11 @@ export function useCourses() {
   return useQuery({
     queryKey: ["courses"],
     queryFn: async (): Promise<Course[]> => {
-      const { data, error } = await supabase.from("courses").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("courses")
+        .select("*")
+        .order("display_order", { ascending: true })
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },

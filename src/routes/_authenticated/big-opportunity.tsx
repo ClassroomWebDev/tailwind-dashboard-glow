@@ -47,6 +47,7 @@ type Draft = {
   title: string;
   description: string;
   banner_url: string;
+  thumbnail_url: string;
   price: string;
   regular_price: string;
   student_price: string;
@@ -63,6 +64,7 @@ const EMPTY: Draft = {
   title: "",
   description: "",
   banner_url: "",
+  thumbnail_url: "",
   price: "0",
   regular_price: "0",
   student_price: "0",
@@ -97,6 +99,7 @@ function BigOpportunityPage() {
       title: draft.title.trim(),
       description: draft.description.trim() || null,
       banner_url: draft.banner_url.trim() || null,
+      thumbnail_url: draft.thumbnail_url.trim() || null,
       price: Number(draft.price) || 0,
       regular_price: Number(draft.regular_price) || 0,
       student_price: Number(draft.student_price) || 0,
@@ -137,6 +140,7 @@ function BigOpportunityPage() {
       title: p.title,
       description: p.description ?? "",
       banner_url: p.banner_url ?? "",
+      thumbnail_url: p.thumbnail_url ?? "",
       price: String(p.price ?? 0),
       regular_price: String(p.regular_price ?? 0),
       student_price: String(p.student_price ?? 0),
@@ -186,6 +190,7 @@ function BigOpportunityPage() {
                 title: p.title ?? "Untitled programme",
                 description: p.description ?? null,
                 bannerUrl: p.banner_url ?? null,
+                thumbnailUrl: p.thumbnail_url ?? null,
                 tag: p.is_active ? "Big Opportunity" : "Inactive",
                 regular: Number(p.regular_price || p.price || 0),
                 student: Number(p.student_price || p.price || 0),
@@ -248,7 +253,14 @@ function BigOpportunityPage() {
                 />
               </div>
               <ImageInput
-                label="Banner / thumbnail"
+                label="Course thumbnail (16:9)"
+                value={draft.thumbnail_url}
+                onChange={(next) => setDraft({ ...draft, thumbnail_url: next })}
+                folder="course-thumbnails"
+                className="sm:col-span-2"
+              />
+              <ImageInput
+                label="Banner (optional)"
                 value={draft.banner_url}
                 onChange={(next) => setDraft({ ...draft, banner_url: next })}
                 folder="banners"

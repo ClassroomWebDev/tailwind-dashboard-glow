@@ -48,6 +48,7 @@ function OpportunityCatalog() {
     title: c?.name ?? "Untitled opportunity",
     description: c?.mission ?? null,
     bannerUrl: c?.banner_url ?? null,
+    thumbnailUrl: c?.thumbnail_url ?? null,
     regular: Number(c?.regular_price ?? 0),
     student: Number(c?.student_price ?? 0),
     ambassador: Number(c?.ambassador_price ?? 0),
