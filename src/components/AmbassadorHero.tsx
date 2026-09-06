@@ -18,7 +18,7 @@ export function AmbassadorHero() {
     (s) => s.status === "approved" && !s.deleted_at && s.ambassador_id === profile?.id,
   ).length;
 
-  const target = settings?.season_target_points ?? 1000;
+  void settings;
   const learning = profile?.learning_points ?? 0;
   const leadership = profile?.leadership_points ?? 0;
   const info = milestoneProgress(milestones ?? [], learning, leadership);
