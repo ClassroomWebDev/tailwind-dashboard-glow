@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TablePagination, usePagination } from "@/components/TablePagination";
 import { SESSION_TYPE_LABELS, type SessionType } from "@/lib/schedule";
 import { SeasonFilter, useSeasonFilter } from "@/components/SeasonFilter";
 import { Input } from "@/components/ui/input";
