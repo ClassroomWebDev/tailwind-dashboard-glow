@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageInput } from "@/components/ImageInput";
+import { ImageInput, SafeImage } from "@/components/ImageInput";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { BrowserTabPreview } from "@/components/SiteHead";
 import {
   DEFAULT_SITE_SETTINGS,
@@ -17,6 +19,7 @@ import {
   type FooterColumn,
   type FooterLink,
   type FooterValue,
+  type HeaderValue,
 } from "@/hooks/useSiteSettings";
 
 function Section({
@@ -427,7 +430,7 @@ export function HeaderAdmin() {
 
       <Field label="Navigation links">
         <LinkRows
-          rows={form.nav_links}
+          links={form.nav_links}
           onChange={(nav_links) => setForm((f) => ({ ...f, nav_links }))}
           addLabel="Add navigation link"
         />
