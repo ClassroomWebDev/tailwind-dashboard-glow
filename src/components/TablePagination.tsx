@@ -57,7 +57,15 @@ function pageNumbers(page: number, pageCount: number) {
   return [...set].sort((a, b) => a - b);
 }
 
-export function TablePagination({ pagination, label = "rows" }: { pagination: Pagination<unknown>; label?: string }) {
+export function TablePagination({
+  pagination,
+  label = "rows",
+  sizes = [...PAGE_SIZES],
+}: {
+  pagination: Pagination<unknown>;
+  label?: string;
+  sizes?: number[];
+}) {
   const { page, pageSize, pageCount, total, setPage, setPageSize } = pagination;
   if (total === 0) return null;
   const from = (page - 1) * pageSize + 1;

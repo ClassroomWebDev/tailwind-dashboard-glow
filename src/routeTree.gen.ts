@@ -30,6 +30,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedReviewsRouteImport } from './routes/_authenticated/reviews'
 import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/sales'
 import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
+import { Route as AuthenticatedSuccessStoryRouteImport } from './routes/_authenticated/success-story'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedOpportunitiesCreateRouteImport } from './routes/_authenticated/opportunities.create'
@@ -143,6 +144,12 @@ const AuthenticatedSeasonsRoute = AuthenticatedSeasonsRouteImport.update({
   path: '/seasons',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSuccessStoryRoute =
+  AuthenticatedSuccessStoryRouteImport.update({
+    id: '/success-story',
+    path: '/success-story',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -187,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/reviews': typeof AuthenticatedReviewsRoute
   '/sales': typeof AuthenticatedSalesRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
+  '/success-story': typeof AuthenticatedSuccessStoryRoute
   '/support': typeof AuthenticatedSupportRoute
   '/users': typeof AuthenticatedUsersRoute
   '/opportunities/create': typeof AuthenticatedOpportunitiesCreateRoute
@@ -213,6 +221,7 @@ export interface FileRoutesByTo {
   '/reviews': typeof AuthenticatedReviewsRoute
   '/sales': typeof AuthenticatedSalesRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
+  '/success-story': typeof AuthenticatedSuccessStoryRoute
   '/support': typeof AuthenticatedSupportRoute
   '/users': typeof AuthenticatedUsersRoute
   '/opportunities/create': typeof AuthenticatedOpportunitiesCreateRoute
@@ -241,6 +250,7 @@ export interface FileRoutesById {
   '/_authenticated/reviews': typeof AuthenticatedReviewsRoute
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
   '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
+  '/_authenticated/success-story': typeof AuthenticatedSuccessStoryRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/opportunities/create': typeof AuthenticatedOpportunitiesCreateRoute
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/sales'
     | '/seasons'
+    | '/success-story'
     | '/support'
     | '/users'
     | '/opportunities/create'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/sales'
     | '/seasons'
+    | '/success-story'
     | '/support'
     | '/users'
     | '/opportunities/create'
@@ -322,6 +334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reviews'
     | '/_authenticated/sales'
     | '/_authenticated/seasons'
+    | '/_authenticated/success-story'
     | '/_authenticated/support'
     | '/_authenticated/users'
     | '/_authenticated/opportunities/create'
@@ -485,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSeasonsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/success-story': {
+      id: '/_authenticated/success-story'
+      path: '/success-story'
+      fullPath: '/success-story'
+      preLoaderRoute: typeof AuthenticatedSuccessStoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/support': {
       id: '/_authenticated/support'
       path: '/support'
@@ -533,6 +553,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReviewsRoute: typeof AuthenticatedReviewsRoute
   AuthenticatedSalesRoute: typeof AuthenticatedSalesRoute
   AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
+  AuthenticatedSuccessStoryRoute: typeof AuthenticatedSuccessStoryRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedOpportunitiesCreateRoute: typeof AuthenticatedOpportunitiesCreateRoute
@@ -556,6 +577,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReviewsRoute: AuthenticatedReviewsRoute,
   AuthenticatedSalesRoute: AuthenticatedSalesRoute,
   AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
+  AuthenticatedSuccessStoryRoute: AuthenticatedSuccessStoryRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedOpportunitiesCreateRoute: AuthenticatedOpportunitiesCreateRoute,
