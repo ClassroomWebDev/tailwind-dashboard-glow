@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Users, Award, BookOpen, ArrowRight, ShieldCheck, Quote, Sparkles } from "lucide-react";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SafeImage } from "@/components/ImageInput";
+import { DEFAULT_SITE_SETTINGS, useSiteSettings } from "@/hooks/useSiteSettings";
 import { byKind, usePublishedCms } from "@/hooks/useCms";
 import { LogoBoard } from "@/components/LogoBoard";
 import { ReviewCarousel } from "@/components/ReviewCarousel";
@@ -51,6 +53,8 @@ const DEFAULT_FEATURES = [
 
 function Homepage() {
   const { data: cms } = usePublishedCms();
+  const { data: site } = useSiteSettings();
+  const header = site?.header ?? DEFAULT_SITE_SETTINGS.header;
   const { data: logos } = useLogoBoards();
   const { data: reviews } = useApprovedReviews();
   const heroes = byKind(cms, "hero");
