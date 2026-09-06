@@ -1492,6 +1492,71 @@ export type Database = {
         }
         Relationships: []
       }
+      success_stories: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          image_url: string | null
+          social_url: string | null
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          social_url?: string | null
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          social_url?: string | null
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
+      success_story_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "success_story_reactions_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "success_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_contacts: {
         Row: {
           available_hours: string | null
@@ -1599,6 +1664,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bump_success_story_views: {
+        Args: { _story_id: string }
+        Returns: undefined
+      }
       can_view_all_sales: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
