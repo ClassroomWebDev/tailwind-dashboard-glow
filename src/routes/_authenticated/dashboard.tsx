@@ -15,6 +15,8 @@ import { profileCompletion, FIELD_LABELS } from "@/lib/profile-meta";
 import { ROLE_LABELS } from "@/lib/types";
 import { Leaderboard } from "@/components/Leaderboard";
 import { BirthdayBanner } from "@/components/BirthdayBanner";
+import { AnnouncementPopup } from "@/components/AnnouncementPopup";
+
 import { NoticeWidget } from "@/components/NoticeWidget";
 import { AmbassadorHero } from "@/components/AmbassadorHero";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
