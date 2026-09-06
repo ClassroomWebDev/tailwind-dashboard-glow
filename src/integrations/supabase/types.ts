@@ -927,6 +927,42 @@ export type Database = {
           },
         ]
       }
+      payment_gateways: {
+        Row: {
+          account_number: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          provider: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          account_number?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          provider?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          provider?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
@@ -1305,9 +1341,13 @@ export type Database = {
           invoice_no: string | null
           notes: string | null
           order_no: string | null
+          payment_account_number: string | null
+          payment_gateway_id: string | null
           payment_method: string
+          payment_proof_url: string | null
           payment_ref: string | null
           season_id: string | null
+          sender_account: string | null
           status: Database["public"]["Enums"]["sale_status"]
           student_district: string | null
           student_email: string | null
@@ -1331,9 +1371,13 @@ export type Database = {
           invoice_no?: string | null
           notes?: string | null
           order_no?: string | null
+          payment_account_number?: string | null
+          payment_gateway_id?: string | null
           payment_method: string
+          payment_proof_url?: string | null
           payment_ref?: string | null
           season_id?: string | null
+          sender_account?: string | null
           status?: Database["public"]["Enums"]["sale_status"]
           student_district?: string | null
           student_email?: string | null
@@ -1357,9 +1401,13 @@ export type Database = {
           invoice_no?: string | null
           notes?: string | null
           order_no?: string | null
+          payment_account_number?: string | null
+          payment_gateway_id?: string | null
           payment_method?: string
+          payment_proof_url?: string | null
           payment_ref?: string | null
           season_id?: string | null
+          sender_account?: string | null
           status?: Database["public"]["Enums"]["sale_status"]
           student_district?: string | null
           student_email?: string | null
@@ -1383,6 +1431,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_payment_gateway_id_fkey"
+            columns: ["payment_gateway_id"]
+            isOneToOne: false
+            referencedRelation: "payment_gateways"
             referencedColumns: ["id"]
           },
           {
