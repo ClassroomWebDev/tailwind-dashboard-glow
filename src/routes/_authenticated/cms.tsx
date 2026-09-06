@@ -17,7 +17,7 @@ import { CompanyWingsAdmin, LogoBoardsAdmin } from "@/components/EcosystemAdmin"
 import { ReviewsModeration } from "@/components/ReviewsModeration";
 import { BrandSettings } from "@/components/BrandSettings";
 import { ImageInput } from "@/components/ImageInput";
-import { AuthCopyAdmin, FooterAdmin, SiteIdentityAdmin } from "@/components/SiteCmsAdmin";
+import { AuthCopyAdmin, FooterAdmin, HeaderAdmin, SiteIdentityAdmin } from "@/components/SiteCmsAdmin";
 
 export const Route = createFileRoute("/_authenticated/cms")({
   component: CmsPage,
@@ -67,11 +67,15 @@ function CmsPage() {
             <TabsTrigger value="reviews">Reviews Moderation</TabsTrigger>
             <TabsTrigger value="branding">Branding</TabsTrigger>
             <TabsTrigger value="identity">Site Identity</TabsTrigger>
+            <TabsTrigger value="header">Header / Logo</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="login">Login Page</TabsTrigger>
           </TabsList>
           <TabsContent value="identity" className="mt-6">
             <SiteIdentityAdmin />
+          </TabsContent>
+          <TabsContent value="header" className="mt-6">
+            <HeaderAdmin />
           </TabsContent>
           <TabsContent value="footer" className="mt-6">
             <FooterAdmin />
