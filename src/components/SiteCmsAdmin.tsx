@@ -20,6 +20,8 @@ import {
   type FooterLink,
   type FooterValue,
   type HeaderValue,
+  type PopupValue,
+
 } from "@/hooks/useSiteSettings";
 
 function Section({
@@ -99,7 +101,69 @@ export function SiteIdentityAdmin() {
   );
 }
 
-/** Login / signup page wording. */
+const SIZE_OPTIONS: { value: "sm" | "md" | "lg" | "xl"; label: string }[] = [
+  { value: "sm", label: "Small" },
+  { value: "md", label: "Medium" },
+  { value: "lg", label: "Large" },
+  { value: "xl", label: "Extra large" },
+];
+
+function SizePicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: "sm" | "md" | "lg" | "xl";
+  onChange: (v: "sm" | "md" | "lg" | "xl") => void;
+}) {
+  return (
+    <Field label={label}>
+      <div className="flex flex-wrap gap-2">
+        {SIZE_OPTIONS.map((o) => (
+          <Button
+            key={o.value}
+            type="button"
+            size="sm"
+            variant={value === o.value ? "default" : "outline"}
+            onClick={() => onChange(o.value)}
+          >
+            {o.label}
+          </Button>
+        ))}
+      </div>
+    </Field>
+  );
+}
+
+function HeightSlider({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <Field label={`${label} — ${value}px`}>
+      <Slider
+        value={[value]}
+        min={min}
+        max={max}
+        step={2}
+        onValueChange={([v]) => onChange(v ?? value)}
+        className="max-w-sm"
+      />
+    </Field>
+  );
+}
+
+/** Login / signup page wording, logos and helpline. */
 export function AuthCopyAdmin() {
   const { data } = useSiteSettings();
   const save = useSaveSiteSetting();
@@ -110,11 +174,25 @@ export function AuthCopyAdmin() {
   }, [data]);
 
   return (
-    <Section title="Login page copy" hint="Shown on the sign in and sign up screen.">
-      <Field label="Portal heading">
+    <Section title="Login page" hint="Every element of the split sign in screen.">
+      <ImageInput
+        label="Left panel logo (PNG, SVG, WebP)"
+        value={form.left_logo_url}
+        folder="brand"
+        onChange={(left_logo_url) => setForm((f) => ({ ...f, left_logo_url }))}
+      />
+      <HeightSlider
+        label="Left logo height"
+        value={form.left_logo_height}
+        min={24}
+        max={100}
+        onChange={(left_logo_height) => setForm((f) => ({ ...f, left_logo_height }))}
+      />
+      <Field label="Left brand text (optional)">
         <Input
           value={form.heading}
           maxLength={80}
+          placeholder="Leave empty to show only the logo"
           onChange={(e) => setForm((f) => ({ ...f, heading: e.target.value }))}
         />
       </Field>
@@ -133,13 +211,62 @@ export function AuthCopyAdmin() {
           onChange={(e) => setForm((f) => ({ ...f, subtitle: e.target.value }))}
         />
       </Field>
+      <SizePicker
+        label="Headline size"
+        value={form.left_title_size}
+        onChange={(left_title_size) => setForm((f) => ({ ...f, left_title_size }))}
+      />
+      <SizePicker
+        label="Body text size"
+        value={form.left_body_size}
+        onChange={(left_body_size) => setForm((f) => ({ ...f, left_body_size }))}
+      />
+      <Field label="Bottom left note">
+        <Input
+          value={form.bottom_text}
+          maxLength={120}
+          onChange={(e) => setForm((f) => ({ ...f, bottom_text: e.target.value }))}
+        />
+      </Field>
+
+      <ImageInput
+        label="Form logo (above “Welcome back”)"
+        value={form.right_logo_url}
+        folder="brand"
+        onChange={(right_logo_url) => setForm((f) => ({ ...f, right_logo_url }))}
+      />
+      <HeightSlider
+        label="Form logo height"
+        value={form.right_logo_height}
+        min={24}
+        max={80}
+        onChange={(right_logo_height) => setForm((f) => ({ ...f, right_logo_height }))}
+      />
+
+      <Field label="Helpline notice text">
+        <Textarea
+          value={form.helpline_text}
+          rows={2}
+          maxLength={300}
+          onChange={(e) => setForm((f) => ({ ...f, helpline_text: e.target.value }))}
+        />
+      </Field>
+      <Field label="Helpline phone / WhatsApp number">
+        <Input
+          value={form.helpline_phone}
+          maxLength={40}
+          placeholder="+8801XXXXXXXXX"
+          onChange={(e) => setForm((f) => ({ ...f, helpline_phone: e.target.value }))}
+        />
+      </Field>
+
       <SaveButton
         saving={save.isPending}
         onClick={() =>
           save.mutate(
             { key: "auth", value: form },
             {
-              onSuccess: () => toast.success("Login page copy saved"),
+              onSuccess: () => toast.success("Login page saved"),
               onError: (e) => toast.error(e instanceof Error ? e.message : "Could not save"),
             },
           )
@@ -148,6 +275,64 @@ export function AuthCopyAdmin() {
     </Section>
   );
 }
+
+/** Announcement modal shown to members right after sign in. */
+export function PostLoginPopupAdmin() {
+  const { data } = useSiteSettings();
+  const save = useSaveSiteSetting();
+  const [form, setForm] = useState<PopupValue>(DEFAULT_SITE_SETTINGS.popup);
+
+  useEffect(() => {
+    if (data) setForm(data.popup);
+  }, [data]);
+
+  return (
+    <Section title="Post-login popup" hint="Shown once per session on the dashboard after sign in.">
+      <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/40 p-4">
+        <Switch checked={form.enabled} onCheckedChange={(enabled) => setForm((f) => ({ ...f, enabled }))} />
+        <span className="text-sm font-medium">{form.enabled ? "Popup is live" : "Popup is off"}</span>
+      </div>
+      <ImageInput
+        label="Banner image (optional)"
+        value={form.image_url}
+        folder="popup"
+        onChange={(image_url) => setForm((f) => ({ ...f, image_url }))}
+      />
+      <Field label="Headline">
+        <Input value={form.title} maxLength={120} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
+      </Field>
+      <Field label="Message">
+        <Textarea
+          value={form.description}
+          rows={5}
+          maxLength={1200}
+          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+        />
+      </Field>
+      <Field label="Helpline / WhatsApp number">
+        <Input
+          value={form.helpline}
+          maxLength={40}
+          placeholder="+8801XXXXXXXXX"
+          onChange={(e) => setForm((f) => ({ ...f, helpline: e.target.value }))}
+        />
+      </Field>
+      <SaveButton
+        saving={save.isPending}
+        onClick={() =>
+          save.mutate(
+            { key: "popup", value: form },
+            {
+              onSuccess: () => toast.success("Popup settings saved"),
+              onError: (e) => toast.error(e instanceof Error ? e.message : "Could not save"),
+            },
+          )
+        }
+      />
+    </Section>
+  );
+}
+
 
 function LinkRows({
   links,

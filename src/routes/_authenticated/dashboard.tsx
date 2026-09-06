@@ -15,6 +15,8 @@ import { profileCompletion, FIELD_LABELS } from "@/lib/profile-meta";
 import { ROLE_LABELS } from "@/lib/types";
 import { Leaderboard } from "@/components/Leaderboard";
 import { BirthdayBanner } from "@/components/BirthdayBanner";
+import { AnnouncementPopup } from "@/components/AnnouncementPopup";
+
 import { NoticeWidget } from "@/components/NoticeWidget";
 import { AmbassadorHero } from "@/components/AmbassadorHero";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
@@ -108,7 +110,9 @@ function Dashboard() {
 
   return (
     <div className="space-y-10">
+      <AnnouncementPopup />
       <BirthdayBanner fullName={profile?.full_name} dateOfBirth={profile?.date_of_birth} />
+
       {!role || role === "ambassador" ? <AmbassadorHero /> : null}
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">

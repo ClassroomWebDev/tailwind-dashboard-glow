@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DEFAULT_SITE_SETTINGS, useSiteSettings } from "@/hooks/useSiteSettings";
+import { SafeImage } from "@/components/ImageInput";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -111,19 +113,43 @@ function AuthPage() {
 
   if (hold) return <HoldModal notice={hold} />;
 
+  const titleSize = { sm: "text-2xl", md: "text-3xl", lg: "text-4xl", xl: "text-5xl" }[copy.left_title_size];
+  const bodySize = { sm: "text-xs", md: "text-sm", lg: "text-base", xl: "text-lg" }[copy.left_body_size];
+  const helplineHref = copy.helpline_phone
+    ? `https://wa.me/${copy.helpline_phone.replace(/\D/g, "")}`
+    : "";
+
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="hidden flex-col justify-between bg-surface-dark p-12 text-surface-dark-foreground lg:flex">
-        <span className="font-display text-lg font-semibold">{copy.heading}</span>
-        <div>
-          <h2 className="font-display text-4xl font-bold leading-tight">{copy.title}</h2>
-          <p className="mt-4 max-w-sm text-sm text-surface-dark-foreground/70">{copy.subtitle}</p>
+        <div className="flex items-center gap-3">
+          {copy.left_logo_url ? (
+            <SafeImage
+              src={copy.left_logo_url}
+              alt={copy.heading || "Brand logo"}
+              className="w-auto object-contain"
+              style={{ height: `${copy.left_logo_height}px` }}
+            />
+          ) : null}
+          {copy.heading ? <span className="font-display text-lg font-semibold">{copy.heading}</span> : null}
         </div>
-        <p className="text-xs text-surface-dark-foreground/50">Policy compliant member access</p>
+        <div>
+          <h2 className={`font-display font-bold leading-tight ${titleSize}`}>{copy.title}</h2>
+          <p className={`mt-4 max-w-sm text-surface-dark-foreground/70 ${bodySize}`}>{copy.subtitle}</p>
+        </div>
+        <p className="text-xs text-surface-dark-foreground/50">{copy.bottom_text}</p>
       </div>
 
       <div className="flex items-center justify-center px-4 py-14">
         <div className="w-full max-w-sm">
+          {copy.right_logo_url ? (
+            <SafeImage
+              src={copy.right_logo_url}
+              alt="Brand logo"
+              className="mb-5 w-auto object-contain"
+              style={{ height: `${copy.right_logo_height}px` }}
+            />
+          ) : null}
           <h1 className="font-display text-3xl font-bold tracking-tight">
             {mode === "login" ? "Welcome back" : mode === "signup" ? "Create account" : "Reset password"}
           </h1>
@@ -132,6 +158,7 @@ function AuthPage() {
               ? "We'll email you a secure reset link."
               : "Use your email and password to continue."}
           </p>
+
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
             {mode === "signup" ? (
@@ -170,7 +197,24 @@ function AuthPage() {
                     ? "Create account"
                     : "Send reset link"}
             </Button>
+
+            {copy.helpline_text || copy.helpline_phone ? (
+              <p className="rounded-xl border border-primary/20 bg-accent/60 px-3 py-2 text-center text-xs leading-relaxed text-muted-foreground">
+                {copy.helpline_text}{" "}
+                {copy.helpline_phone ? (
+                  <a
+                    href={helplineHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    {copy.helpline_phone}
+                  </a>
+                ) : null}
+              </p>
+            ) : null}
           </form>
+
 
           <div className="mt-6 space-y-2 text-sm">
             {mode === "login" ? (
