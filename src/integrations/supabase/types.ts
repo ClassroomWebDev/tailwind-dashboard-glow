@@ -1337,6 +1337,7 @@ export type Database = {
           course_id: string | null
           created_at: string
           deleted_at: string | null
+          facebook_url: string | null
           id: string
           invoice_no: string | null
           notes: string | null
@@ -1367,6 +1368,7 @@ export type Database = {
           course_id?: string | null
           created_at?: string
           deleted_at?: string | null
+          facebook_url?: string | null
           id?: string
           invoice_no?: string | null
           notes?: string | null
@@ -1397,6 +1399,7 @@ export type Database = {
           course_id?: string | null
           created_at?: string
           deleted_at?: string | null
+          facebook_url?: string | null
           id?: string
           invoice_no?: string | null
           notes?: string | null

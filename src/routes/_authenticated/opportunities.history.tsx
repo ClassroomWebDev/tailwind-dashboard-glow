@@ -842,6 +842,16 @@ function EditSaleDialog({ sale, onClose, onSaved }: { sale: Sale | null; onClose
             {sale?.payment_account_number ? <p>Receiving number: {sale.payment_account_number}</p> : null}
             {sale?.sender_account ? <p>Sender number: {sale.sender_account}</p> : null}
             <p>TrxID: {sale?.payment_ref || "—"}</p>
+            {sale?.facebook_url ? (
+              <a
+                href={sale.facebook_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 block font-semibold text-primary underline underline-offset-2"
+              >
+                Student facebook profile
+              </a>
+            ) : null}
             {sale?.payment_proof_url ? (
               <a
                 href={sale.payment_proof_url}

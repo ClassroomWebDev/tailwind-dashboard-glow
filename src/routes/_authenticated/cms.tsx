@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -67,57 +67,93 @@ function CmsPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : allowed ? (
-        <Tabs defaultValue="sections">
-          <TabsList className="flex-wrap">
-            <TabsTrigger value="sections">Content Sections</TabsTrigger>
-            <TabsTrigger value="logos">Logo Boards</TabsTrigger>
-            <TabsTrigger value="wings">Sister Concerns</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews Moderation</TabsTrigger>
-            <TabsTrigger value="branding">Branding</TabsTrigger>
-            <TabsTrigger value="identity">Site Identity</TabsTrigger>
-            <TabsTrigger value="header">Header / Logo</TabsTrigger>
-            <TabsTrigger value="footer">Footer</TabsTrigger>
-            <TabsTrigger value="login">Login Page</TabsTrigger>
-            <TabsTrigger value="popup">Post-Login Popup</TabsTrigger>
-            <TabsTrigger value="payments">Payment Gateways</TabsTrigger>
-
-          </TabsList>
-          <TabsContent value="identity" className="mt-6">
-            <SiteIdentityAdmin />
-          </TabsContent>
-          <TabsContent value="header" className="mt-6">
-            <HeaderAdmin />
-          </TabsContent>
-          <TabsContent value="footer" className="mt-6">
-            <FooterAdmin />
-          </TabsContent>
-          <TabsContent value="login" className="mt-6">
-            <AuthCopyAdmin />
-          </TabsContent>
-          <TabsContent value="popup" className="mt-6">
-            <PostLoginPopupAdmin />
-          </TabsContent>
-          <TabsContent value="payments" className="mt-6">
-            <PaymentGatewaysAdmin />
-          </TabsContent>
-
-          <TabsContent value="sections" className="mt-6">
-            <CmsBoard />
-          </TabsContent>
-          <TabsContent value="logos" className="mt-6">
-            <LogoBoardsAdmin canManage={role === "admin"} />
-          </TabsContent>
-          <TabsContent value="wings" className="mt-6">
-            <CompanyWingsAdmin canManage={role === "admin"} />
-          </TabsContent>
-          <TabsContent value="reviews" className="mt-6">
-            <ReviewsModeration />
-          </TabsContent>
-          <TabsContent value="branding" className="mt-6">
-            <BrandSettings />
-          </TabsContent>
-        </Tabs>
+        <CmsWorkspace isAdmin={role === "admin"} />
       ) : null}
+    </div>
+  );
+}
+
+type CmsPane = { value: string; label: string; render: (isAdmin: boolean) => ReactNode };
+
+const CMS_GROUPS: { id: string; label: string; panes: CmsPane[] }[] = [
+  {
+    id: "content",
+    label: "Page Content",
+    panes: [
+      { value: "sections", label: "Content Sections", render: () => <CmsBoard /> },
+      { value: "logos", label: "Logo Boards", render: (a) => <LogoBoardsAdmin canManage={a} /> },
+      { value: "wings", label: "Sister Concerns", render: (a) => <CompanyWingsAdmin canManage={a} /> },
+      { value: "reviews", label: "Reviews Moderation", render: () => <ReviewsModeration /> },
+    ],
+  },
+  {
+    id: "branding",
+    label: "Branding & Identity",
+    panes: [
+      { value: "identity", label: "Site Identity & Favicon", render: () => <SiteIdentityAdmin /> },
+      { value: "header", label: "Header & Logo", render: () => <HeaderAdmin /> },
+      { value: "branding", label: "Sidebar & Colors", render: () => <BrandSettings /> },
+      { value: "footer", label: "Footer", render: () => <FooterAdmin /> },
+      { value: "login", label: "Login Page", render: () => <AuthCopyAdmin /> },
+    ],
+  },
+  {
+    id: "ops",
+    label: "Operations & Promos",
+    panes: [
+      { value: "payments", label: "Payment Gateways", render: () => <PaymentGatewaysAdmin /> },
+      { value: "popup", label: "Post-Login Popup", render: () => <PostLoginPopupAdmin /> },
+    ],
+  },
+];
+
+/** Two-level grouped CMS navigation: group segments, then scrollable pills. */
+function CmsWorkspace({ isAdmin }: { isAdmin: boolean }) {
+  const [groupId, setGroupId] = useState(CMS_GROUPS[0]!.id);
+  const [pane, setPane] = useState(CMS_GROUPS[0]!.panes[0]!.value);
+  const group = CMS_GROUPS.find((g) => g.id === groupId) ?? CMS_GROUPS[0]!;
+  const active = group.panes.find((p) => p.value === pane) ?? group.panes[0]!;
+
+  return (
+    <div className="min-w-0">
+      <div className="inline-flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-border bg-muted/60 p-1">
+        {CMS_GROUPS.map((g) => (
+          <button
+            key={g.id}
+            type="button"
+            onClick={() => {
+              setGroupId(g.id);
+              setPane(g.panes[0]!.value);
+            }}
+            className={`shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+              g.id === group.id
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            }`}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1">
+        {group.panes.map((p) => (
+          <button
+            key={p.value}
+            type="button"
+            onClick={() => setPane(p.value)}
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition-colors ${
+              p.value === active.value
+                ? "border-primary bg-accent font-semibold text-accent-foreground"
+                : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6">{active.render(isAdmin)}</div>
     </div>
   );
 }
