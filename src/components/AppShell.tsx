@@ -26,10 +26,11 @@ import {
   Info,
   X,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRole, useProfile } from "@/hooks/useProfile";
 import { DEFAULT_BRAND_TITLE, useProgramSettings } from "@/hooks/useBusiness";
+import { markSectionSeen, useSectionUpdates, type Section } from "@/hooks/useSectionUpdates";
 import { ROLE_LABELS, type AppRole } from "@/lib/types";
 
 type NavItem = {
@@ -41,6 +42,7 @@ type NavItem = {
     | "/opportunities/create"
     | "/opportunities/history"
     | "/opportunity-seeker"
+    | "/success-story"
     | "/leaderboard"
     | "/users"
     | "/notices"
@@ -61,6 +63,8 @@ type NavItem = {
   key?: string;
   /** Optional live counter shown as a badge. */
   badge?: "pending-sales";
+  /** Section tracked for the "NEW" badge. */
+  section?: Section;
 };
 
 function navForRole(role: AppRole | undefined): NavItem[] {
