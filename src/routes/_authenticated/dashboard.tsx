@@ -108,7 +108,9 @@ function Dashboard() {
 
   return (
     <div className="space-y-10">
+      <AnnouncementPopup />
       <BirthdayBanner fullName={profile?.full_name} dateOfBirth={profile?.date_of_birth} />
+
       {!role || role === "ambassador" ? <AmbassadorHero /> : null}
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
