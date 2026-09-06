@@ -20,6 +20,8 @@ import {
   type FooterLink,
   type FooterValue,
   type HeaderValue,
+  type PopupValue,
+
 } from "@/hooks/useSiteSettings";
 
 function Section({
