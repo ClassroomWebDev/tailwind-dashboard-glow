@@ -15,7 +15,32 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { TablePagination, usePagination } from "@/components/TablePagination";
 import { formatDateTime } from "@/lib/format";
+
+/** Newest submissions first. */
+const newestFirst = (rows: Sale[]) => [...rows].sort((a, b) => b.created_at.localeCompare(a.created_at));
+
+/** Live keyword match across the fields staff search by. */
+function matchesSale(s: Sale, term: string, courseLabel: string, ...extra: (string | null | undefined)[]) {
+  const q = term.trim().toLowerCase();
+  if (!q) return true;
+  return [
+    s.order_no,
+    s.invoice_no,
+    s.tx_id,
+    s.payment_ref,
+    s.payment_method,
+    s.student_name,
+    s.student_mobile,
+    s.student_institution,
+    s.status,
+    courseLabel,
+    ...extra,
+  ]
+    .filter(Boolean)
+    .some((v) => String(v).toLowerCase().includes(q));
+}
 
 export const Route = createFileRoute("/_authenticated/opportunities/history")({
   head: () => ({
