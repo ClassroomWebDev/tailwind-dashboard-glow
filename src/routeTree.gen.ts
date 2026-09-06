@@ -32,6 +32,7 @@ import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
 import { Route as AuthenticatedSuccessStoryRouteImport } from './routes/_authenticated/success-story'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
+import { Route as AuthenticatedSystemResetRouteImport } from './routes/_authenticated/system-reset'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedOpportunitiesCreateRouteImport } from './routes/_authenticated/opportunities.create'
 import { Route as AuthenticatedOpportunitiesHistoryRouteImport } from './routes/_authenticated/opportunities.history'
@@ -155,6 +156,12 @@ const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
   path: '/support',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSystemResetRoute =
+  AuthenticatedSystemResetRouteImport.update({
+    id: '/system-reset',
+    path: '/system-reset',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/seasons': typeof AuthenticatedSeasonsRoute
   '/success-story': typeof AuthenticatedSuccessStoryRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/system-reset': typeof AuthenticatedSystemResetRoute
   '/users': typeof AuthenticatedUsersRoute
   '/opportunities/create': typeof AuthenticatedOpportunitiesCreateRoute
   '/opportunities/history': typeof AuthenticatedOpportunitiesHistoryRoute
@@ -223,6 +231,7 @@ export interface FileRoutesByTo {
   '/seasons': typeof AuthenticatedSeasonsRoute
   '/success-story': typeof AuthenticatedSuccessStoryRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/system-reset': typeof AuthenticatedSystemResetRoute
   '/users': typeof AuthenticatedUsersRoute
   '/opportunities/create': typeof AuthenticatedOpportunitiesCreateRoute
   '/opportunities/history': typeof AuthenticatedOpportunitiesHistoryRoute
@@ -252,6 +261,7 @@ export interface FileRoutesById {
   '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
   '/_authenticated/success-story': typeof AuthenticatedSuccessStoryRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
+  '/_authenticated/system-reset': typeof AuthenticatedSystemResetRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/opportunities/create': typeof AuthenticatedOpportunitiesCreateRoute
   '/_authenticated/opportunities/history': typeof AuthenticatedOpportunitiesHistoryRoute
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/seasons'
     | '/success-story'
     | '/support'
+    | '/system-reset'
     | '/users'
     | '/opportunities/create'
     | '/opportunities/history'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/seasons'
     | '/success-story'
     | '/support'
+    | '/system-reset'
     | '/users'
     | '/opportunities/create'
     | '/opportunities/history'
@@ -336,6 +348,7 @@ export interface FileRouteTypes {
     | '/_authenticated/seasons'
     | '/_authenticated/success-story'
     | '/_authenticated/support'
+    | '/_authenticated/system-reset'
     | '/_authenticated/users'
     | '/_authenticated/opportunities/create'
     | '/_authenticated/opportunities/history'
@@ -512,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/system-reset': {
+      id: '/_authenticated/system-reset'
+      path: '/system-reset'
+      fullPath: '/system-reset'
+      preLoaderRoute: typeof AuthenticatedSystemResetRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/users': {
       id: '/_authenticated/users'
       path: '/users'
@@ -555,6 +575,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
   AuthenticatedSuccessStoryRoute: typeof AuthenticatedSuccessStoryRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
+  AuthenticatedSystemResetRoute: typeof AuthenticatedSystemResetRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedOpportunitiesCreateRoute: typeof AuthenticatedOpportunitiesCreateRoute
   AuthenticatedOpportunitiesHistoryRoute: typeof AuthenticatedOpportunitiesHistoryRoute
@@ -579,6 +600,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
   AuthenticatedSuccessStoryRoute: AuthenticatedSuccessStoryRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
+  AuthenticatedSystemResetRoute: AuthenticatedSystemResetRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedOpportunitiesCreateRoute: AuthenticatedOpportunitiesCreateRoute,
   AuthenticatedOpportunitiesHistoryRoute:
