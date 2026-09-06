@@ -190,7 +190,10 @@ export function OpportunityCard({
                 </p>
               ) : null}
             </div>
-            <Tier label="For coordinator" value={item.coordinator} regular={item.regular} />
+            {showCoordinatorTier ? (
+              <Tier label="For coordinator" value={item.coordinator} regular={item.regular} />
+            ) : null}
+
             <Tier label="For ambassador" value={item.ambassador} regular={item.regular} />
           </div>
 
