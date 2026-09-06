@@ -104,11 +104,14 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     title: "",
     description: "",
     helpline: "",
+    max_width: 600,
   },
 
   header: {
     logo_url: "",
     logo_height: 48,
+    sidebar_logo_url: "",
+    sidebar_logo_height: 36,
     show_brand_text: true,
     brand_title: "Classroom Ambassador",
     brand_tagline: "Empowering Campus Leaders",
