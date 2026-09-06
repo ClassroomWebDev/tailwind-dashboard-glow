@@ -62,28 +62,67 @@ function Homepage() {
   return (
     <div className="flex min-h-screen flex-col justify-between bg-[#FAFAFA] font-sans text-slate-900">
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-white shadow-sm">
-              CA
-            </div>
-            <div>
-              <span className="block text-lg font-bold leading-tight tracking-tight text-slate-900">
-                Classroom Ambassador
-              </span>
-              <span className="text-xs font-medium text-slate-500">Empowering Campus Leaders</span>
-            </div>
-          </div>
-          <nav className="flex items-center gap-2">
-          <Link
-            to="/auth"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90"
-          >
-            Sign In
+        <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            {header.logo_url ? (
+              <SafeImage
+                src={header.logo_url}
+                alt={`${header.brand_title} logo`}
+                className="w-auto max-w-[60vw] object-contain"
+                style={{ height: `clamp(32px, ${Math.round(header.logo_height * 0.7)}px + 1vw, ${header.logo_height}px)` }}
+              />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-white shadow-sm">
+                CA
+              </div>
+            )}
+            {header.show_brand_text ? (
+              <div className="min-w-0">
+                <span className="block truncate text-base font-bold leading-tight tracking-tight text-slate-900 sm:text-lg">
+                  {header.brand_title}
+                </span>
+                <span className="hidden text-xs font-medium text-slate-500 sm:block">{header.brand_tagline}</span>
+              </div>
+            ) : null}
           </Link>
+          <nav className="flex flex-wrap items-center gap-2">
+            {header.nav_links.map((l) => (
+              <a
+                key={l.id}
+                href={l.url}
+                className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:text-primary md:inline-flex"
+              >
+                {l.label}
+              </a>
+            ))}
+            {header.show_contact ? (
+              <a
+                href={header.contact_url || "/about"}
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-primary hover:text-primary"
+              >
+                {header.contact_label}
+              </a>
+            ) : null}
+            {header.show_register ? (
+              <a
+                href={header.register_url || "/apply"}
+                className="inline-flex items-center justify-center rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+              >
+                {header.register_label}
+              </a>
+            ) : null}
+            {header.show_login ? (
+              <Link
+                to="/auth"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90"
+              >
+                {header.login_label}
+              </Link>
+            ) : null}
           </nav>
         </div>
       </header>
+
 
       <main className="flex-1">
         {/* Hero (CMS driven with a safe default) */}
