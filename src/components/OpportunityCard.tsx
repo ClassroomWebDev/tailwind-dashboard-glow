@@ -50,47 +50,53 @@ function Tier({ label, value, regular }: { label: string; value: number; regular
 }
 
 
-/** Active/scheduled batch line with the classroom group shortcut. */
+/** Schedule + classroom group row for every running batch (falls back to the next upcoming one). */
 function BatchMeta({ courseId }: { courseId: string }) {
   const { data: batches } = useBatches(courseId);
   const list = (batches ?? []).filter(Boolean);
   if (list.length === 0) return null;
-  // Prefer the next upcoming batch, otherwise the most recent one.
+
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = [...list].filter((b) => (b?.start_date ?? "") >= today).sort((a, b) =>
-    (a?.start_date ?? "").localeCompare(b?.start_date ?? ""),
-  );
-  const batch = upcoming[0] ?? list[0];
-  if (!batch) return null;
+  const running = list.filter((b) => batchState(b, today) === "running");
+  const upcoming = [...list]
+    .filter((b) => batchState(b, today) === "upcoming")
+    .sort((a, b) => (a.start_date ?? "").localeCompare(b.start_date ?? ""));
+
+  const shown = running.length > 0 ? running : upcoming.length > 0 ? [upcoming[0]!] : [list[0]!];
 
   return (
-    <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground">
-        <span className="inline-flex items-center gap-1.5 font-bold text-foreground">
-          <Users2 className="size-3.5 text-primary" /> {batch.name ?? "Batch"}
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <CalendarDays className="size-3.5 text-primary" /> Starts {formatDate(batch.start_date)}
-        </span>
-        {batch.class_time ? (
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-3.5 text-primary" /> {formatTime(batch.class_time)}
-          </span>
-        ) : null}
-      </div>
-      {batch.community_link ? (
-        <a
-          href={batch.community_link}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="mt-3 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-background px-3 py-2 text-xs font-bold text-primary transition hover:bg-primary/5"
-        >
-          Join Classroom / Batch Group <ExternalLink className="size-3.5" />
-        </a>
-      ) : null}
+    <div className="mt-4 divide-y divide-border rounded-2xl border border-border bg-muted/40">
+      {shown.map((batch) => (
+        <div key={batch.id} className="p-4">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 font-bold text-foreground">
+              <Users2 className="size-3.5 text-primary" /> {batch.name ?? "Batch"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="size-3.5 text-primary" /> Starts {formatDate(batch.start_date)}
+            </span>
+            {batch.class_time ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="size-3.5 text-primary" /> {formatTime(batch.class_time)}
+              </span>
+            ) : null}
+          </div>
+          {batch.community_link ? (
+            <a
+              href={batch.community_link}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-background px-3 py-2 text-xs font-bold text-primary transition hover:bg-primary/5"
+            >
+              Join Classroom / Batch Group <ExternalLink className="size-3.5" />
+            </a>
+          ) : null}
+        </div>
+      ))}
     </div>
   );
 }
+
 
 /**
  * Single full-width opportunity card used by both My Opportunities and Big Opportunities.
