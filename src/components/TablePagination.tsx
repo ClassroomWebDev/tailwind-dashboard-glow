@@ -86,7 +86,7 @@ export function TablePagination({
             className="h-8 rounded-lg border border-input bg-background px-2 text-xs font-semibold"
             aria-label="Rows per page"
           >
-            {PAGE_SIZES.map((n) => (
+            {sizes.map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
