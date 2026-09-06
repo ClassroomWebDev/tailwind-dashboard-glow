@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMyRole } from "@/hooks/useProfile";
+import { TablePagination, usePagination } from "@/components/TablePagination";
 import {
   listApplications,
   updateApplication,
@@ -170,6 +171,9 @@ function SeekerTable({
   onRestore?: (id: string) => void;
   onPurge?: (id: string) => void;
 }) {
+  const sorted = [...rows].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const pagination = usePagination(sorted);
+
   if (rows.length === 0)
     return (
       <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
@@ -178,6 +182,7 @@ function SeekerTable({
     );
 
   return (
+    <div>
     <div className="overflow-x-auto rounded-2xl border border-border bg-card">
       <table className="w-full min-w-[860px] text-sm">
         <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
@@ -187,12 +192,13 @@ function SeekerTable({
             <th className="px-4 py-3 text-left font-semibold">Campus</th>
             <th className="px-4 py-3 text-left font-semibold">District</th>
             <th className="px-4 py-3 text-left font-semibold">Referred by</th>
+            <th className="px-4 py-3 text-left font-semibold">Assigned Coordinator</th>
             <th className="px-4 py-3 text-left font-semibold">Applied</th>
             {isStaff ? <th className="px-4 py-3 text-right font-semibold">Actions</th> : null}
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
+          {pagination.rows.map((r) => (
             <tr key={r.id} className="border-t border-border">
               <td className="px-4 py-3 font-semibold">{r.full_name}</td>
               <td className="px-4 py-3">{r.mobile}</td>
@@ -204,6 +210,7 @@ function SeekerTable({
                   <span className="ml-1 text-xs text-muted-foreground">({r.ambassador_code})</span>
                 ) : null}
               </td>
+              <td className="px-4 py-3">{r.coordinator_label ?? "N/A"}</td>
               <td className="px-4 py-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
               {isStaff ? (
                 <td className="px-4 py-3">
@@ -234,6 +241,8 @@ function SeekerTable({
           ))}
         </tbody>
       </table>
+    </div>
+    <TablePagination pagination={pagination} label="applications" />
     </div>
   );
 }
