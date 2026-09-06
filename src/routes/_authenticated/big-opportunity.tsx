@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useBigOpportunities, type BigOpportunity } from "@/hooks/useBigOpportunities";
 import { useMyRole } from "@/hooks/useProfile";
 import { OpportunityCard } from "@/components/OpportunityCard";
+import { CatalogFilterTabs, type CatalogFilter } from "@/components/CatalogFilterTabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -84,6 +85,7 @@ function BigOpportunityPage() {
   const { data: programmes, isLoading } = useBigOpportunities(!canManage);
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [filter, setFilter] = useState<CatalogFilter>("all");
   const [saving, setSaving] = useState(false);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["big-opportunities"] });
@@ -224,6 +226,7 @@ function BigOpportunityPage() {
                 learningPointsPerClass: 0,
                 courseId: null,
               }}
+              showCoordinatorTier={role !== "ambassador"}
               outlineOpen={false}
               onToggleOutline={() => undefined}
             >
