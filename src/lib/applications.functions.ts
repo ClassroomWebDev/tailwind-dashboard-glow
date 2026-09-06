@@ -13,6 +13,7 @@ export type SeekerRow = {
   ambassador_code: string | null;
   ambassador_id: string | null;
   ambassador_name: string | null;
+  coordinator_label: string | null;
   created_at: string;
   deleted_at: string | null;
 };
@@ -35,7 +36,7 @@ async function scope(context: Ctx) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const [{ data: roles }, { data: profiles }] = await Promise.all([
     supabaseAdmin.from("user_roles").select("user_id, role"),
-    supabaseAdmin.from("profiles").select("id, full_name, coordinator_id, mentor_id, support_manager_id"),
+    supabaseAdmin.from("profiles").select("id, full_name, auto_id, coordinator_id, mentor_id, support_manager_id"),
   ]);
   const uid = context.userId;
   const myRoles = new Set((roles ?? []).filter((r) => r.user_id === uid).map((r) => r.role as string));
@@ -56,7 +57,11 @@ async function scope(context: Ctx) {
   }
 
   const names = new Map((profiles ?? []).map((p) => [p.id, p.full_name] as const));
-  return { supabaseAdmin, isStaff, visibleAmbassadors, names };
+  const coordinatorOf = new Map((profiles ?? []).map((p) => [p.id, p.coordinator_id] as const));
+  const label = new Map(
+    (profiles ?? []).map((p) => [p.id, `${p.auto_id ?? "—"} - ${p.full_name || "Member"}`] as const),
+  );
+  return { supabaseAdmin, isStaff, visibleAmbassadors, names, coordinatorOf, label };
 }
 
 async function assertStaff(context: Ctx) {
@@ -69,7 +74,7 @@ async function assertStaff(context: Ctx) {
 export const listApplications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SeekerRow[]> => {
-    const { supabaseAdmin, isStaff, visibleAmbassadors, names } = await scope(context);
+    const { supabaseAdmin, isStaff, visibleAmbassadors, names, coordinatorOf, label } = await scope(context);
     const { data, error } = await supabaseAdmin
       .from("applications")
       .select(
@@ -79,9 +84,16 @@ export const listApplications = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const rows = (data ?? []) as unknown as SeekerRow[];
     const scoped = isStaff
-      ? rows.filter((r) => true)
+      ? rows
       : rows.filter((r) => !r.deleted_at && r.ambassador_id && visibleAmbassadors.has(r.ambassador_id));
-    return scoped.map((r) => ({ ...r, ambassador_name: r.ambassador_id ? names.get(r.ambassador_id) ?? null : null }));
+    return scoped.map((r) => {
+      const coordinatorId = r.ambassador_id ? (coordinatorOf.get(r.ambassador_id) ?? null) : null;
+      return {
+        ...r,
+        ambassador_name: r.ambassador_id ? (names.get(r.ambassador_id) ?? null) : null,
+        coordinator_label: coordinatorId ? (label.get(coordinatorId) ?? null) : null,
+      };
+    });
   });
 
 export const updateApplication = createServerFn({ method: "POST" })
