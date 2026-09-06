@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CalendarClock, ExternalLink, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
+import { CalendarClock, ExternalLink, Loader2, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCourseTopics, useBatches, type Batch } from "@/hooks/useBatches";
 import { useSessions, type ClassSession } from "@/hooks/useBusiness";
@@ -15,6 +15,7 @@ import {
   type SessionStatus,
   type SessionType,
 } from "@/lib/schedule";
+import { useDirectory } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -104,6 +105,7 @@ export function BatchManager({ courseId, courseName, classQuantity }: Props) {
         days_of_week: form.days,
         total_classes: Number(form.total_classes) || 0,
         community_link: form.community_link.trim() || null,
+        status: form.start_date > today() ? "upcoming" : "running",
         created_by: uid,
       })
       .select()
@@ -316,6 +318,7 @@ function BatchCard({
   onDelete: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [editing, setEditing] = useState(false);
   const ordered = [...sessions].sort(
     (a, b) => a.session_date.localeCompare(b.session_date) || (a.sequence_no ?? 0) - (b.sequence_no ?? 0),
   );
@@ -324,7 +327,13 @@ function BatchCard({
     <div className="rounded-2xl border border-border bg-background p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-semibold">{batch.name}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-semibold">{batch.name}</p>
+            <Badge variant="secondary" className="capitalize">
+              {batch.status ?? "upcoming"}
+            </Badge>
+            {batch.seat_limit ? <Badge variant="outline">{batch.seat_limit} seats</Badge> : null}
+          </div>
           <p className="text-xs text-muted-foreground">
             Starts {batch.start_date}
             {batch.class_time ? ` · ${batch.class_time.slice(0, 5)}` : ""} ·{" "}
@@ -344,6 +353,9 @@ function BatchCard({
               Join Classroom Group <ExternalLink className="size-3.5" />
             </a>
           ) : null}
+          <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+            <Pencil className="size-3.5" /> Edit Batch
+          </Button>
           <Button size="sm" variant="outline" onClick={() => setExpanded((v) => !v)}>
             <CalendarClock className="size-3.5" /> {expanded ? "Hide" : "Sessions"}
           </Button>
@@ -352,6 +364,8 @@ function BatchCard({
           </Button>
         </div>
       </div>
+
+      {editing ? <BatchEditor batch={batch} onClose={() => setEditing(false)} onRefresh={onRefresh} /> : null}
 
       {expanded ? (
         <div className="mt-4 space-y-2">
@@ -363,6 +377,151 @@ function BatchCard({
         </div>
       ) : null}
     </div>
+  );
+}
+
+const BATCH_STATUSES = ["running", "upcoming", "completed"] as const;
+
+/** Admin/Manager batch editor — name, status, schedule, seats, group link and faculty. */
+function BatchEditor({
+  batch,
+  onClose,
+  onRefresh,
+}: {
+  batch: Batch;
+  onClose: () => void;
+  onRefresh: () => void;
+}) {
+  const { data: members } = useDirectory();
+  const faculty = (members ?? []).filter((m) => m.role === "mentor" || m.role === "admin");
+  const [form, setForm] = useState({
+    name: batch.name ?? "",
+    status: (batch.status ?? "upcoming") as string,
+    start_date: (batch.start_date ?? "").slice(0, 10),
+    class_time: (batch.class_time ?? "").slice(0, 5),
+    seat_limit: batch.seat_limit == null ? "" : String(batch.seat_limit),
+    community_link: batch.community_link ?? "",
+    faculty_id: batch.faculty_id ?? "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    if (!form.name.trim()) {
+      toast.error("Batch name is required");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from("batches")
+      .update({
+        name: form.name.trim(),
+        status: form.status,
+        start_date: form.start_date,
+        class_time: form.class_time || null,
+        seat_limit: form.seat_limit === "" ? null : Number(form.seat_limit),
+        community_link: form.community_link.trim() || null,
+        faculty_id: form.faculty_id || null,
+      })
+      .eq("id", batch.id);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Batch updated");
+    onRefresh();
+    onClose();
+  }
+
+  return (
+    <Dialog open onOpenChange={(v) => (v ? null : onClose())}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit batch</DialogTitle>
+          <DialogDescription>Update the batch details — changes apply everywhere instantly.</DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="grid gap-1.5 text-sm font-medium">
+            Batch name / number
+            <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium">
+            Status
+            <select
+              value={form.status}
+              onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
+              className="h-10 rounded-xl border border-input bg-background px-3 text-sm capitalize"
+            >
+              {BATCH_STATUSES.map((s) => (
+                <option key={s} value={s} className="capitalize">
+                  {s}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium">
+            Start date
+            <Input
+              type="date"
+              value={form.start_date}
+              onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
+            />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium">
+            Class time
+            <Input
+              type="time"
+              value={form.class_time}
+              onChange={(e) => setForm((f) => ({ ...f, class_time: e.target.value }))}
+            />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium">
+            Seat limit
+            <Input
+              type="number"
+              min={0}
+              value={form.seat_limit}
+              placeholder="Unlimited"
+              onChange={(e) => setForm((f) => ({ ...f, seat_limit: e.target.value }))}
+            />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium">
+            Assigned faculty
+            <select
+              value={form.faculty_id}
+              onChange={(e) => setForm((f) => ({ ...f, faculty_id: e.target.value }))}
+              className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+            >
+              <option value="">Not assigned</option>
+              {faculty.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.full_name}
+                  {m.auto_id ? ` (${m.auto_id})` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium sm:col-span-2">
+            Classroom / WhatsApp group link
+            <Input
+              value={form.community_link}
+              placeholder="https://chat.whatsapp.com/…"
+              onChange={(e) => setForm((f) => ({ ...f, community_link: e.target.value }))}
+            />
+          </label>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={() => void save()} disabled={saving}>
+            {saving ? <Loader2 className="size-4 animate-spin" /> : null} Save batch
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

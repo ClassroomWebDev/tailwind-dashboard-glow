@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CourseOutlineViewer } from "@/components/CourseOutlineViewer";
 import { formatDate, formatTime } from "@/lib/format";
 import { sanitizeImageUrl } from "@/lib/images";
+import { batchState } from "@/lib/batch-status";
 
 export type OpportunityItem = {
   key: string;
@@ -50,47 +51,53 @@ function Tier({ label, value, regular }: { label: string; value: number; regular
 }
 
 
-/** Active/scheduled batch line with the classroom group shortcut. */
+/** Schedule + classroom group row for every running batch (falls back to the next upcoming one). */
 function BatchMeta({ courseId }: { courseId: string }) {
   const { data: batches } = useBatches(courseId);
   const list = (batches ?? []).filter(Boolean);
   if (list.length === 0) return null;
-  // Prefer the next upcoming batch, otherwise the most recent one.
+
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = [...list].filter((b) => (b?.start_date ?? "") >= today).sort((a, b) =>
-    (a?.start_date ?? "").localeCompare(b?.start_date ?? ""),
-  );
-  const batch = upcoming[0] ?? list[0];
-  if (!batch) return null;
+  const running = list.filter((b) => batchState(b, today) === "running");
+  const upcoming = [...list]
+    .filter((b) => batchState(b, today) === "upcoming")
+    .sort((a, b) => (a.start_date ?? "").localeCompare(b.start_date ?? ""));
+
+  const shown = running.length > 0 ? running : upcoming.length > 0 ? [upcoming[0]!] : [list[0]!];
 
   return (
-    <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground">
-        <span className="inline-flex items-center gap-1.5 font-bold text-foreground">
-          <Users2 className="size-3.5 text-primary" /> {batch.name ?? "Batch"}
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <CalendarDays className="size-3.5 text-primary" /> Starts {formatDate(batch.start_date)}
-        </span>
-        {batch.class_time ? (
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-3.5 text-primary" /> {formatTime(batch.class_time)}
-          </span>
-        ) : null}
-      </div>
-      {batch.community_link ? (
-        <a
-          href={batch.community_link}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="mt-3 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-background px-3 py-2 text-xs font-bold text-primary transition hover:bg-primary/5"
-        >
-          Join Classroom / Batch Group <ExternalLink className="size-3.5" />
-        </a>
-      ) : null}
+    <div className="mt-4 divide-y divide-border rounded-2xl border border-border bg-muted/40">
+      {shown.map((batch) => (
+        <div key={batch.id} className="p-4">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 font-bold text-foreground">
+              <Users2 className="size-3.5 text-primary" /> {batch.name ?? "Batch"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="size-3.5 text-primary" /> Starts {formatDate(batch.start_date)}
+            </span>
+            {batch.class_time ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="size-3.5 text-primary" /> {formatTime(batch.class_time)}
+              </span>
+            ) : null}
+          </div>
+          {batch.community_link ? (
+            <a
+              href={batch.community_link}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-background px-3 py-2 text-xs font-bold text-primary transition hover:bg-primary/5"
+            >
+              Join Classroom / Batch Group <ExternalLink className="size-3.5" />
+            </a>
+          ) : null}
+        </div>
+      ))}
     </div>
   );
 }
+
 
 /**
  * Single full-width opportunity card used by both My Opportunities and Big Opportunities.
@@ -143,7 +150,7 @@ export function OpportunityCard({
         </div>
 
         {/* Right column — every detail preserved */}
-        <div className="min-w-0 flex-1 p-6 pt-0 md:pl-0 md:pt-6">
+        <div className="min-w-0 flex-1 p-4 pt-0 sm:p-6 sm:pt-0 md:pl-0 md:pt-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-display text-xl font-bold leading-tight">{item.title}</h3>
@@ -163,9 +170,9 @@ export function OpportunityCard({
                 </>
               ) : null}
               {item.hasCertificate ? (
-                <Badge variant="outline" className="border-primary/40 text-primary">
-                  Certificate Included
-                </Badge>
+                <span className="rounded-full border-none bg-brand-red px-2.5 py-0.5 text-xs font-semibold text-white">
+                  Certificate
+                </span>
               ) : null}
             </div>
             <Badge variant="secondary" className="shrink-0">
@@ -177,7 +184,7 @@ export function OpportunityCard({
             <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{item.description}</p>
           ) : null}
 
-          <div className="mt-5 grid grid-cols-2 items-start gap-3 xl:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 items-start gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Tier label="Regular fee" value={item.regular} regular={item.regular} />
             <div className="rounded-xl bg-brand-red px-3 py-2 text-brand-red-foreground">
               <p className="text-[0.65rem] font-bold uppercase tracking-wide text-brand-red-foreground/80">

@@ -126,10 +126,13 @@ export type Database = {
           created_at: string
           created_by: string | null
           days_of_week: number[]
+          faculty_id: string | null
           id: string
           name: string
           notes: string | null
+          seat_limit: number | null
           start_date: string
+          status: string
           total_classes: number
           updated_at: string
         }
@@ -140,10 +143,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           days_of_week?: number[]
+          faculty_id?: string | null
           id?: string
           name: string
           notes?: string | null
+          seat_limit?: number | null
           start_date: string
+          status?: string
           total_classes?: number
           updated_at?: string
         }
@@ -154,10 +160,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           days_of_week?: number[]
+          faculty_id?: string | null
           id?: string
           name?: string
           notes?: string | null
+          seat_limit?: number | null
           start_date?: string
+          status?: string
           total_classes?: number
           updated_at?: string
         }
@@ -167,6 +176,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batches_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
