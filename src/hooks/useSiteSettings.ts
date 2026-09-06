@@ -15,6 +15,23 @@ export type AuthCopyValue = {
   subtitle: string;
 };
 
+export type HeaderValue = {
+  logo_url: string;
+  logo_height: number;
+  show_brand_text: boolean;
+  brand_title: string;
+  brand_tagline: string;
+  nav_links: FooterLink[];
+  show_login: boolean;
+  login_label: string;
+  show_register: boolean;
+  register_label: string;
+  register_url: string;
+  show_contact: boolean;
+  contact_label: string;
+  contact_url: string;
+};
+
 export type FooterValue = {
   brand_title: string;
   logo_url: string;
@@ -31,8 +48,10 @@ export type FooterValue = {
 export type SiteSettings = {
   brand: BrandSettingsValue;
   auth: AuthCopyValue;
+  header: HeaderValue;
   footer: FooterValue;
 };
+
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   brand: {
@@ -44,6 +63,22 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     title: "One profile. One support line.",
     subtitle:
       "Keep your member profile at 100% and stay connected with your coordinator, mentor and support manager.",
+  },
+  header: {
+    logo_url: "",
+    logo_height: 48,
+    show_brand_text: true,
+    brand_title: "Classroom Ambassador",
+    brand_tagline: "Empowering Campus Leaders",
+    nav_links: [],
+    show_login: true,
+    login_label: "Sign In",
+    show_register: false,
+    register_label: "Register",
+    register_url: "/apply",
+    show_contact: false,
+    contact_label: "Contact Us",
+    contact_url: "/about",
   },
   footer: {
     brand_title: "Classroom Bangladesh",
@@ -69,6 +104,7 @@ export function useSiteSettings() {
       const merged: SiteSettings = {
         brand: { ...DEFAULT_SITE_SETTINGS.brand },
         auth: { ...DEFAULT_SITE_SETTINGS.auth },
+        header: { ...DEFAULT_SITE_SETTINGS.header },
         footer: { ...DEFAULT_SITE_SETTINGS.footer },
       };
       for (const row of data ?? []) {
