@@ -145,6 +145,8 @@ export function useSiteSettings() {
         auth: { ...DEFAULT_SITE_SETTINGS.auth },
         header: { ...DEFAULT_SITE_SETTINGS.header },
         footer: { ...DEFAULT_SITE_SETTINGS.footer },
+        popup: { ...DEFAULT_SITE_SETTINGS.popup },
+
       };
       for (const row of data ?? []) {
         const key = row.key as keyof SiteSettings;
