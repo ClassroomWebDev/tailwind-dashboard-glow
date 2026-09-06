@@ -72,8 +72,14 @@ function navForRole(role: AppRole | undefined): NavItem[] {
   const profile: NavItem = { to: "/profile", label: "Profile", icon: UserRoundCog };
   const support: NavItem = { to: "/support", label: "Support", icon: LifeBuoy };
   const leaderboard: NavItem = { to: "/leaderboard", label: "Leaderboard", icon: Trophy };
-  const notices: NavItem = { to: "/notices", label: "Notice Board", icon: Megaphone };
-  const events: NavItem = { to: "/events", label: "Events", icon: CalendarDays };
+  const notices: NavItem = { to: "/notices", label: "Notice Board", icon: Megaphone, section: "notices" };
+  const events: NavItem = { to: "/events", label: "Events", icon: CalendarDays, section: "events" };
+  const successStory: NavItem = {
+    to: "/success-story",
+    label: "Success Story",
+    icon: Heart,
+    section: "success-story",
+  };
   const calendar: NavItem = { to: "/calendar", label: "Calendar", icon: CalendarRange };
   const certificates: NavItem = { to: "/certificates", label: "Certificates", icon: Award };
   const reviews: NavItem = { to: "/reviews", label: "Reviews", icon: Star };
