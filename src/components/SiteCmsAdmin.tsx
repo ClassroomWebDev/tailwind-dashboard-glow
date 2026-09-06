@@ -359,3 +359,177 @@ export function FooterAdmin() {
     </div>
   );
 }
+
+/** Public navbar: logo, logo height, brand text, nav links and CTA buttons. */
+export function HeaderAdmin() {
+  const { data } = useSiteSettings();
+  const save = useSaveSiteSetting();
+  const [form, setForm] = useState<HeaderValue>(DEFAULT_SITE_SETTINGS.header);
+
+  useEffect(() => {
+    if (data) setForm(data.header);
+  }, [data]);
+
+  const presets = [
+    { label: "Small", value: 36 },
+    { label: "Medium", value: 48 },
+    { label: "Large", value: 64 },
+    { label: "Extra large", value: 80 },
+  ];
+
+  return (
+    <Section title="Header & brand logo" hint="Controls the logo, size and buttons on the public navigation bar.">
+      <ImageInput
+        label="Header logo (PNG, SVG, WebP or JPG)"
+        value={form.logo_url}
+        folder="brand"
+        onChange={(logo_url) => setForm((f) => ({ ...f, logo_url }))}
+      />
+
+      <Field label={`Logo height — ${form.logo_height}px`}>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {presets.map((p) => (
+              <Button
+                key={p.value}
+                type="button"
+                size="sm"
+                variant={form.logo_height === p.value ? "default" : "outline"}
+                onClick={() => setForm((f) => ({ ...f, logo_height: p.value }))}
+              >
+                {p.label} ({p.value}px)
+              </Button>
+            ))}
+          </div>
+          <Slider
+            value={[form.logo_height]}
+            min={32}
+            max={120}
+            step={2}
+            onValueChange={([v]) => setForm((f) => ({ ...f, logo_height: v ?? f.logo_height }))}
+          />
+        </div>
+      </Field>
+
+      <div className="flex items-center justify-between rounded-2xl border border-border p-3">
+        <Label className="text-sm font-medium">Show brand text next to the logo</Label>
+        <Switch
+          checked={form.show_brand_text}
+          onCheckedChange={(show_brand_text) => setForm((f) => ({ ...f, show_brand_text }))}
+        />
+      </div>
+      <Field label="Brand title">
+        <Input value={form.brand_title} onChange={(e) => setForm((f) => ({ ...f, brand_title: e.target.value }))} />
+      </Field>
+      <Field label="Brand tagline">
+        <Input value={form.brand_tagline} onChange={(e) => setForm((f) => ({ ...f, brand_tagline: e.target.value }))} />
+      </Field>
+
+      <Field label="Navigation links">
+        <LinkRows
+          rows={form.nav_links}
+          onChange={(nav_links) => setForm((f) => ({ ...f, nav_links }))}
+          addLabel="Add navigation link"
+        />
+      </Field>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="space-y-2 rounded-2xl border border-border p-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">Login button</Label>
+            <Switch checked={form.show_login} onCheckedChange={(show_login) => setForm((f) => ({ ...f, show_login }))} />
+          </div>
+          <Input value={form.login_label} onChange={(e) => setForm((f) => ({ ...f, login_label: e.target.value }))} />
+        </div>
+        <div className="space-y-2 rounded-2xl border border-border p-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">Register button</Label>
+            <Switch
+              checked={form.show_register}
+              onCheckedChange={(show_register) => setForm((f) => ({ ...f, show_register }))}
+            />
+          </div>
+          <Input
+            value={form.register_label}
+            onChange={(e) => setForm((f) => ({ ...f, register_label: e.target.value }))}
+          />
+          <Input
+            value={form.register_url}
+            placeholder="/apply"
+            onChange={(e) => setForm((f) => ({ ...f, register_url: e.target.value }))}
+          />
+        </div>
+        <div className="space-y-2 rounded-2xl border border-border p-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">Contact button</Label>
+            <Switch
+              checked={form.show_contact}
+              onCheckedChange={(show_contact) => setForm((f) => ({ ...f, show_contact }))}
+            />
+          </div>
+          <Input
+            value={form.contact_label}
+            onChange={(e) => setForm((f) => ({ ...f, contact_label: e.target.value }))}
+          />
+          <Input
+            value={form.contact_url}
+            placeholder="/about"
+            onChange={(e) => setForm((f) => ({ ...f, contact_url: e.target.value }))}
+          />
+        </div>
+      </div>
+
+      <Field label="Live navbar preview">
+        <div className="overflow-hidden rounded-2xl border border-border bg-background">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              {form.logo_url ? (
+                <SafeImage
+                  src={form.logo_url}
+                  alt="Logo preview"
+                  className="w-auto object-contain"
+                  style={{ height: form.logo_height }}
+                />
+              ) : (
+                <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+                  CA
+                </div>
+              )}
+              {form.show_brand_text ? (
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold leading-tight">{form.brand_title}</p>
+                  <p className="truncate text-xs text-muted-foreground">{form.brand_tagline}</p>
+                </div>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+              {form.nav_links.map((l) => (
+                <span key={l.id} className="text-muted-foreground">
+                  {l.label}
+                </span>
+              ))}
+              {form.show_contact ? <span className="rounded-lg border border-border px-3 py-1.5">{form.contact_label}</span> : null}
+              {form.show_register ? <span className="rounded-lg border border-border px-3 py-1.5">{form.register_label}</span> : null}
+              {form.show_login ? (
+                <span className="rounded-lg bg-primary px-3 py-1.5 text-primary-foreground">{form.login_label}</span>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </Field>
+
+      <SaveButton
+        saving={save.isPending}
+        onClick={() =>
+          save.mutate(
+            { key: "header", value: form },
+            {
+              onSuccess: () => toast.success("Header saved"),
+              onError: (e) => toast.error(e instanceof Error ? e.message : "Could not save"),
+            },
+          )
+        }
+      />
+    </Section>
+  );
+}
