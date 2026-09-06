@@ -162,7 +162,7 @@ const RANGES = [
 function SalesChart({ rows }: { rows: Sale[] }) {
   const [range, setRange] = useState<(typeof RANGES)[number]["key"]>("7");
   const [mode, setMode] = useState<"area" | "bar">("area");
-  const live = rows.filter((s) => !s.deleted_at && s.status !== "rejected");
+  const live = rows.filter((s) => !s.deleted_at && s.status === "approved");
 
   const data = useMemo(() => {
     const days = RANGES.find((r) => r.key === range)?.days ?? 0;
