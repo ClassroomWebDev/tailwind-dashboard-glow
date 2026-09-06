@@ -555,8 +555,24 @@ function GovRows({
                   </td>
                   <td className="px-4 py-3 font-medium">{money(Number(s.amount))}</td>
                   <td className="px-4 py-3">
-                    {s.payment_method}
-                    <span className="block text-xs text-muted-foreground">{s.payment_ref ?? "—"}</span>
+                    <span className="font-medium">{s.payment_method}</span>
+                    {s.payment_account_number ? (
+                      <span className="block text-xs text-muted-foreground">To: {s.payment_account_number}</span>
+                    ) : null}
+                    {s.sender_account ? (
+                      <span className="block text-xs text-muted-foreground">From: {s.sender_account}</span>
+                    ) : null}
+                    <span className="block text-xs text-muted-foreground">TrxID: {s.payment_ref ?? "—"}</span>
+                    {s.payment_proof_url ? (
+                      <a
+                        href={s.payment_proof_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-block text-xs font-semibold text-primary underline underline-offset-2"
+                      >
+                        View receipt
+                      </a>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">{nameWithId(amb)}</td>
                   <td className="px-4 py-3">{coord ? nameWithId(coord) : "Unassigned"}</td>
@@ -819,6 +835,23 @@ function EditSaleDialog({ sale, onClose, onSaved }: { sale: Sale | null; onClose
           <div className="grid gap-1.5">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Payment reference</Label>
             <Input value={form.payment_ref} onChange={(e) => setForm({ ...form, payment_ref: e.target.value })} />
+          </div>
+          <div className="rounded-2xl border border-border bg-muted/50 p-3 text-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Payment verification</p>
+            <p className="mt-1">Gateway: {sale?.payment_method || "—"}</p>
+            {sale?.payment_account_number ? <p>Receiving number: {sale.payment_account_number}</p> : null}
+            {sale?.sender_account ? <p>Sender number: {sale.sender_account}</p> : null}
+            <p>TrxID: {sale?.payment_ref || "—"}</p>
+            {sale?.payment_proof_url ? (
+              <a
+                href={sale.payment_proof_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 inline-block font-semibold text-primary underline underline-offset-2"
+              >
+                View payment receipt
+              </a>
+            ) : null}
           </div>
           <div className="grid gap-1.5">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Notes</Label>

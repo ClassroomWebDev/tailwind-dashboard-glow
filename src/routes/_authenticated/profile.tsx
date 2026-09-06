@@ -325,8 +325,8 @@ function ProfilePage() {
   const toneClass =
     status.tone === "green"
       ? "bg-emerald-100 text-emerald-800"
-      : status.tone === "blue"
-        ? "bg-sky-100 text-sky-800"
+      : status.tone === "red"
+        ? "bg-accent text-accent-foreground"
         : "bg-amber-100 text-amber-900";
 
   return (

@@ -318,6 +318,35 @@ export function PostLoginPopupAdmin() {
           onChange={(e) => setForm((f) => ({ ...f, helpline: e.target.value }))}
         />
       </Field>
+      <Field label={`Popup display size — ${form.max_width}px wide`}>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "Small", value: 450 },
+              { label: "Medium", value: 600 },
+              { label: "Large", value: 800 },
+              { label: "Full banner", value: 950 },
+            ].map((p) => (
+              <Button
+                key={p.value}
+                type="button"
+                size="sm"
+                variant={form.max_width === p.value ? "default" : "outline"}
+                onClick={() => setForm((f) => ({ ...f, max_width: p.value }))}
+              >
+                {p.label} ({p.value}px)
+              </Button>
+            ))}
+          </div>
+          <Slider
+            value={[form.max_width]}
+            min={400}
+            max={1000}
+            step={10}
+            onValueChange={([v]) => setForm((f) => ({ ...f, max_width: v ?? f.max_width }))}
+          />
+        </div>
+      </Field>
       <SaveButton
         saving={save.isPending}
         onClick={() =>
@@ -599,6 +628,34 @@ export function HeaderAdmin() {
           />
         </div>
       </Field>
+
+      <ImageInput
+        label="Sidebar brand logo (PNG, SVG or WebP)"
+        value={form.sidebar_logo_url}
+        folder="brand"
+        onChange={(sidebar_logo_url) => setForm((f) => ({ ...f, sidebar_logo_url }))}
+      />
+      <Field label={`Sidebar logo height — ${form.sidebar_logo_height}px`}>
+        <Slider
+          value={[form.sidebar_logo_height]}
+          min={24}
+          max={64}
+          step={2}
+          onValueChange={([v]) => setForm((f) => ({ ...f, sidebar_logo_height: v ?? f.sidebar_logo_height }))}
+        />
+      </Field>
+      <div className="flex items-center gap-3 rounded-2xl bg-sidebar p-4 text-sidebar-foreground">
+        {form.sidebar_logo_url ? (
+          <SafeImage
+            src={form.sidebar_logo_url}
+            alt="Sidebar logo preview"
+            className="w-auto max-w-[9rem] object-contain"
+            style={{ height: `${form.sidebar_logo_height}px` }}
+          />
+        ) : (
+          <span className="text-sm opacity-70">No sidebar logo — brand text is shown instead.</span>
+        )}
+      </div>
 
       <div className="flex items-center justify-between rounded-2xl border border-border p-3">
         <Label className="text-sm font-medium">Show brand text next to the logo</Label>

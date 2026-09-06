@@ -10,6 +10,8 @@ import { useCourses } from "@/hooks/useBusiness";
 import { useBigOpportunities } from "@/hooks/useBigOpportunities";
 import { useDirectory } from "@/hooks/useDirectory";
 import { DistrictSelect } from "@/components/DistrictSelect";
+import { ImageInput, SafeImage } from "@/components/ImageInput";
+import { gatewayLabel, usePaymentGateways } from "@/hooks/usePaymentGateways";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +35,6 @@ export const Route = createFileRoute("/_authenticated/opportunities/create")({
   component: OpportunityCreatePage,
 });
 
-const PAYMENT_METHODS = ["bKash", "Nagad", "Rocket", "Bank Transfer"] as const;
 const money = (v: number) => `৳${Number(v || 0).toLocaleString("en-US")}`;
 
 const TIERS = [
@@ -66,6 +67,7 @@ function OpportunityEntry() {
   const { data: courses } = useCourses();
   const { data: programmes } = useBigOpportunities(true);
   const { data: directory } = useDirectory();
+  const { data: gateways } = usePaymentGateways(true);
   const queryClient = useQueryClient();
   const selfOnly = role === "ambassador" || !role;
 
@@ -88,7 +90,9 @@ function OpportunityEntry() {
   const [studentEmail, setStudentEmail] = useState("");
   const [studentInstitution, setStudentInstitution] = useState("");
   const [studentDistrict, setStudentDistrict] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<string>(PAYMENT_METHODS[0]);
+  const [gatewayId, setGatewayId] = useState("");
+  const [senderAccount, setSenderAccount] = useState("");
+  const [proofUrl, setProofUrl] = useState("");
   const [orderNo, setOrderNo] = useState("");
   const [paymentRef, setPaymentRef] = useState("");
   const [notes, setNotes] = useState("");
@@ -115,6 +119,7 @@ function OpportunityEntry() {
             : source.student_price
       : 0) ?? 0,
   );
+  const gateway = (gateways ?? []).find((g) => g.id === gatewayId) ?? null;
   const effectiveAmbassadorId = selfOnly || !ambassadorId ? (profile?.id ?? "") : ambassadorId;
 
   const preview = source
@@ -135,7 +140,9 @@ function OpportunityEntry() {
     setStudentEmail("");
     setStudentInstitution("");
     setStudentDistrict("");
-    setPaymentMethod(PAYMENT_METHODS[0]);
+    setGatewayId("");
+    setSenderAccount("");
+    setProofUrl("");
     setOrderNo("");
     setPaymentRef("");
     setNotes("");
@@ -167,6 +174,11 @@ function OpportunityEntry() {
       return;
     }
 
+    if (!gateway) {
+      toast.error("Select a payment method");
+      return;
+    }
+
     setSaving(true);
     const { data: userData } = await supabase.auth.getUser();
     const now = new Date().toISOString();
@@ -180,7 +192,11 @@ function OpportunityEntry() {
       student_email: studentEmail.trim() || null,
       student_institution: studentInstitution.trim() || null,
       student_district: studentDistrict.trim() || null,
-      payment_method: paymentMethod,
+      payment_method: gatewayLabel(gateway),
+      payment_gateway_id: gateway.id,
+      payment_account_number: gateway.account_number,
+      sender_account: senderAccount.trim() || null,
+      payment_proof_url: proofUrl.trim() || null,
       order_no: orderNo.trim(),
       payment_ref: paymentRef.trim() || null,
       notes: notes.trim() || null,
@@ -334,27 +350,75 @@ function OpportunityEntry() {
         <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Payment method *</Label>
           <select
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+            value={gatewayId}
+            onChange={(e) => setGatewayId(e.target.value)}
+            className="h-10 rounded-xl border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
           >
-            {PAYMENT_METHODS.map((m) => (
-              <option key={m} value={m}>
-                {m}
+            <option value="">Select payment method</option>
+            {(gateways ?? []).map((g) => (
+              <option key={g.id} value={g.id}>
+                {gatewayLabel(g)}
               </option>
             ))}
           </select>
+          {(gateways ?? []).length === 0 ? (
+            <p className="text-xs text-muted-foreground">No payment accounts configured yet.</p>
+          ) : null}
         </div>
+
         <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Payment reference
+            Transaction ID / reference
           </Label>
           <Input
             value={paymentRef}
             onChange={(e) => setPaymentRef(e.target.value)}
-            placeholder="Transaction ID / bank trx no / account no"
+            placeholder="TrxID / bank transaction number"
           />
         </div>
+
+        {gateway ? (
+          <div className="grid gap-3 rounded-2xl border border-primary/30 bg-accent/60 p-4 sm:col-span-2 sm:grid-cols-[auto_1fr] sm:items-start">
+            {gateway.image_url ? (
+              <SafeImage
+                src={gateway.image_url}
+                alt={gatewayLabel(gateway)}
+                className="h-24 w-24 rounded-xl border border-border bg-card object-contain"
+              />
+            ) : null}
+            <div className="space-y-1 text-sm">
+              {gateway.provider?.trim() ? (
+                <p className="font-display text-base font-semibold">{gateway.provider}</p>
+              ) : null}
+              {gateway.account_number?.trim() ? (
+                <p>
+                  <span className="text-muted-foreground">Send to: </span>
+                  <span className="font-semibold tracking-wide">{gateway.account_number}</span>
+                </p>
+              ) : null}
+              {gateway.description?.trim() ? (
+                <p className="whitespace-pre-line text-muted-foreground">{gateway.description}</p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="grid gap-1.5">
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Sender account number
+          </Label>
+          <Input
+            value={senderAccount}
+            onChange={(e) => setSenderAccount(e.target.value)}
+            placeholder="Number the payment was sent from"
+          />
+        </div>
+        <ImageInput
+          label="Payment proof / receipt (optional)"
+          folder="payments"
+          value={proofUrl}
+          onChange={setProofUrl}
+        />
         <div className="grid gap-1.5 sm:col-span-2">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Notes / remarks</Label>
           <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />

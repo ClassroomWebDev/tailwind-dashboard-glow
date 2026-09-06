@@ -126,6 +126,18 @@
     font-family: var(--font-display);
   }
 
+  /* Hoverable table rows tint dark red instead of neutral/blue. */
+  tbody tr:hover {
+    background-color: color-mix(in oklch, var(--color-accent) 75%, transparent);
+  }
+
+  /* Native select options highlight dark red where the browser allows it. */
+  option:checked,
+  option:hover {
+    background-color: color-mix(in oklch, var(--color-primary) 12%, transparent);
+    color: var(--color-foreground);
+    font-weight: 500;
+  }
 }
 
 @media print {

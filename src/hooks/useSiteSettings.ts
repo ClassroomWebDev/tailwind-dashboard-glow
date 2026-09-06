@@ -32,12 +32,16 @@ export type PopupValue = {
   title: string;
   description: string;
   helpline: string;
+  /** Modal max width in pixels (400–1000). */
+  max_width: number;
 };
 
 
 export type HeaderValue = {
   logo_url: string;
   logo_height: number;
+  sidebar_logo_url: string;
+  sidebar_logo_height: number;
   show_brand_text: boolean;
   brand_title: string;
   brand_tagline: string;
@@ -100,11 +104,14 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     title: "",
     description: "",
     helpline: "",
+    max_width: 600,
   },
 
   header: {
     logo_url: "",
     logo_height: 48,
+    sidebar_logo_url: "",
+    sidebar_logo_height: 36,
     show_brand_text: true,
     brand_title: "Classroom Ambassador",
     brand_tagline: "Empowering Campus Leaders",

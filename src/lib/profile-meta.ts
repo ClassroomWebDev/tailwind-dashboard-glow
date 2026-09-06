@@ -153,11 +153,11 @@ export function profileCompletion(values: Record<string, unknown>) {
   };
 }
 
-export type CompletionTone = "amber" | "blue" | "green";
+export type CompletionTone = "amber" | "red" | "green";
 
 export function completionStatus(percent: number): { tone: CompletionTone; label: string } {
   if (percent >= 100) return { tone: "green", label: "🎉 100% Profile Completed" };
-  if (percent >= 60) return { tone: "blue", label: "Add CV details to reach 100%" };
+  if (percent >= 60) return { tone: "red", label: "Add CV details to reach 100%" };
   return { tone: "amber", label: "Complete all mandatory fields" };
 }
 

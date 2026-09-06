@@ -24,6 +24,7 @@ import {
   PostLoginPopupAdmin,
   SiteIdentityAdmin,
 } from "@/components/SiteCmsAdmin";
+import { PaymentGatewaysAdmin } from "@/components/PaymentGatewaysAdmin";
 
 
 export const Route = createFileRoute("/_authenticated/cms")({
@@ -78,6 +79,7 @@ function CmsPage() {
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="login">Login Page</TabsTrigger>
             <TabsTrigger value="popup">Post-Login Popup</TabsTrigger>
+            <TabsTrigger value="payments">Payment Gateways</TabsTrigger>
 
           </TabsList>
           <TabsContent value="identity" className="mt-6">
@@ -94,6 +96,9 @@ function CmsPage() {
           </TabsContent>
           <TabsContent value="popup" className="mt-6">
             <PostLoginPopupAdmin />
+          </TabsContent>
+          <TabsContent value="payments" className="mt-6">
+            <PaymentGatewaysAdmin />
           </TabsContent>
 
           <TabsContent value="sections" className="mt-6">

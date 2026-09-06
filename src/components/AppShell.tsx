@@ -31,6 +31,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRole, useProfile } from "@/hooks/useProfile";
 import { DEFAULT_BRAND_TITLE, useProgramSettings } from "@/hooks/useBusiness";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { SafeImage } from "@/components/ImageInput";
 import { markSectionSeen, useSectionUpdates, type Section } from "@/hooks/useSectionUpdates";
 import { ROLE_LABELS, type AppRole } from "@/lib/types";
 
@@ -339,7 +341,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function Brand() {
   const { data: settings } = useProgramSettings();
+  const { data: site } = useSiteSettings();
   const title = settings?.brand_title?.trim() || DEFAULT_BRAND_TITLE;
+  const logo = site?.header.sidebar_logo_url?.trim();
+  const height = Math.min(64, Math.max(24, site?.header.sidebar_logo_height || 36));
   const initials =
     title
       .split(/\s+/)
@@ -349,10 +354,21 @@ function Brand() {
 
   return (
     <div className="flex min-w-0 items-center gap-2.5">
-      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-sidebar-primary font-display text-sm font-bold text-sidebar-primary-foreground">
-        {initials}
-      </span>
-      <span className="truncate font-display text-base font-semibold tracking-tight">{title}</span>
+      {logo ? (
+        <SafeImage
+          src={logo}
+          alt={title}
+          className="w-auto max-w-[9rem] shrink-0 object-contain"
+          style={{ height: `${height}px` }}
+        />
+      ) : (
+        <>
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-sidebar-primary font-display text-sm font-bold text-sidebar-primary-foreground">
+            {initials}
+          </span>
+          <span className="truncate font-display text-base font-semibold tracking-tight">{title}</span>
+        </>
+      )}
     </div>
   );
 }
