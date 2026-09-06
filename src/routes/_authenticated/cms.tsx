@@ -67,56 +67,7 @@ function CmsPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : allowed ? (
-        <Tabs defaultValue="sections">
-          <TabsList className="flex-wrap">
-            <TabsTrigger value="sections">Content Sections</TabsTrigger>
-            <TabsTrigger value="logos">Logo Boards</TabsTrigger>
-            <TabsTrigger value="wings">Sister Concerns</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews Moderation</TabsTrigger>
-            <TabsTrigger value="branding">Branding</TabsTrigger>
-            <TabsTrigger value="identity">Site Identity</TabsTrigger>
-            <TabsTrigger value="header">Header / Logo</TabsTrigger>
-            <TabsTrigger value="footer">Footer</TabsTrigger>
-            <TabsTrigger value="login">Login Page</TabsTrigger>
-            <TabsTrigger value="popup">Post-Login Popup</TabsTrigger>
-            <TabsTrigger value="payments">Payment Gateways</TabsTrigger>
-
-          </TabsList>
-          <TabsContent value="identity" className="mt-6">
-            <SiteIdentityAdmin />
-          </TabsContent>
-          <TabsContent value="header" className="mt-6">
-            <HeaderAdmin />
-          </TabsContent>
-          <TabsContent value="footer" className="mt-6">
-            <FooterAdmin />
-          </TabsContent>
-          <TabsContent value="login" className="mt-6">
-            <AuthCopyAdmin />
-          </TabsContent>
-          <TabsContent value="popup" className="mt-6">
-            <PostLoginPopupAdmin />
-          </TabsContent>
-          <TabsContent value="payments" className="mt-6">
-            <PaymentGatewaysAdmin />
-          </TabsContent>
-
-          <TabsContent value="sections" className="mt-6">
-            <CmsBoard />
-          </TabsContent>
-          <TabsContent value="logos" className="mt-6">
-            <LogoBoardsAdmin canManage={role === "admin"} />
-          </TabsContent>
-          <TabsContent value="wings" className="mt-6">
-            <CompanyWingsAdmin canManage={role === "admin"} />
-          </TabsContent>
-          <TabsContent value="reviews" className="mt-6">
-            <ReviewsModeration />
-          </TabsContent>
-          <TabsContent value="branding" className="mt-6">
-            <BrandSettings />
-          </TabsContent>
-        </Tabs>
+        <CmsWorkspace isAdmin={role === "admin"} />
       ) : null}
     </div>
   );
