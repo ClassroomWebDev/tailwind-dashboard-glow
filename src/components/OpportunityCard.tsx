@@ -108,68 +108,93 @@ export function OpportunityCard({
   /** Extra actions (admin controls, apply button) rendered in the card footer. */
   children?: React.ReactNode;
 }) {
+  const thumb = sanitizeImageUrl(item.thumbnailUrl || item.bannerUrl || "");
   return (
     <article className="mb-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm ring-1 ring-black/[0.02]">
-      {item.bannerUrl ? (
-        <img src={item.bannerUrl} alt={`${item.title} banner`} loading="lazy" className="h-44 w-full object-cover" />
-      ) : null}
-      <div className="p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-display text-xl font-bold leading-tight">{item.title}</h3>
-            {item.hasCertificate ? (
-              <Badge variant="outline" className="border-primary/40 text-primary">
-                Certificate Included
-              </Badge>
-            ) : null}
+      <div className="flex flex-col gap-0 md:flex-row md:items-start">
+        {/* Left column — 16:9 thumbnail */}
+        <div className="w-full shrink-0 p-4 md:w-[34%] md:p-5">
+          <div className="aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted">
+            {thumb ? (
+              <img
+                src={thumb}
+                alt={`${item.title} thumbnail`}
+                loading="lazy"
+                className="size-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="grid size-full place-items-center bg-gradient-to-br from-primary/10 to-brand-red/10 text-center">
+                <div className="text-muted-foreground">
+                  <ImageIcon className="mx-auto size-7" />
+                  <p className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em]">{item.tag}</p>
+                </div>
+              </div>
+            )}
           </div>
-          <Badge variant="secondary" className="shrink-0">
-            {item.tag}
-          </Badge>
-        </div>
-        {item.description ? (
-          <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{item.description}</p>
-        ) : null}
-
-        <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Tier label="Regular fee" value={item.regular} regular={item.regular} />
-          <div className="rounded-xl bg-brand-red px-3 py-2 text-brand-red-foreground">
-            <p className="text-[0.65rem] font-bold uppercase tracking-wide text-brand-red-foreground/80">
-              For student (special)
-            </p>
-            <p className="font-display text-sm font-bold text-brand-red-foreground">{money(item.student)}</p>
-            {scholarship(item.regular, item.student) !== null ? (
-              <p className="text-[0.65rem] font-semibold text-brand-red-foreground/85">
-                {scholarship(item.regular, item.student)}% Scholarship
-              </p>
-            ) : null}
-          </div>
-          <Tier label="For coordinator" value={item.coordinator} regular={item.regular} />
-          <Tier label="For ambassador" value={item.ambassador} regular={item.regular} />
         </div>
 
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {item.learningPointsPerClass > 0 ? (
-            <Badge variant="outline">+{item.learningPointsPerClass} Learning Points / class</Badge>
+        {/* Right column — every detail preserved */}
+        <div className="min-w-0 flex-1 p-6 pt-0 md:pl-0 md:pt-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="font-display text-xl font-bold leading-tight">{item.title}</h3>
+              {item.hasCertificate ? (
+                <Badge variant="outline" className="border-primary/40 text-primary">
+                  Certificate Included
+                </Badge>
+              ) : null}
+            </div>
+            <Badge variant="secondary" className="shrink-0">
+              {item.tag}
+            </Badge>
+          </div>
+          {item.description ? (
+            <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{item.description}</p>
           ) : null}
-          <Badge variant="outline">+{item.leadershipPoints} Leadership Points / sale</Badge>
+
+          <div className="mt-5 grid grid-cols-2 items-start gap-3 xl:grid-cols-4">
+            <Tier label="Regular fee" value={item.regular} regular={item.regular} />
+            <div className="rounded-xl bg-brand-red px-3 py-2 text-brand-red-foreground">
+              <p className="text-[0.65rem] font-bold uppercase tracking-wide text-brand-red-foreground/80">
+                For student (special)
+              </p>
+              <p className="font-display text-sm font-bold text-brand-red-foreground">{money(item.student)}</p>
+              {scholarship(item.regular, item.student) !== null ? (
+                <p className="text-[0.65rem] font-semibold text-brand-red-foreground/85">
+                  {scholarship(item.regular, item.student)}% Scholarship
+                </p>
+              ) : null}
+            </div>
+            <Tier label="For coordinator" value={item.coordinator} regular={item.regular} />
+            <Tier label="For ambassador" value={item.ambassador} regular={item.regular} />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {item.learningPointsPerClass > 0 ? (
+              <Badge variant="outline">+{item.learningPointsPerClass} Learning Points / class</Badge>
+            ) : null}
+            <Badge variant="outline">+{item.leadershipPoints} Leadership Points / sale</Badge>
+          </div>
+
+          {item.courseId ? (
+            <>
+              <CourseOutlineViewer
+                courseId={item.courseId}
+                learningPointsPerClass={item.learningPointsPerClass}
+                open={outlineOpen}
+                onToggle={onToggleOutline}
+              />
+              <BatchMeta courseId={item.courseId} />
+            </>
+          ) : null}
+
+          {children ? <div className="mt-5 flex flex-wrap items-center gap-2">{children}</div> : null}
         </div>
-
-        {item.courseId ? (
-          <>
-            <CourseOutlineViewer
-              courseId={item.courseId}
-              learningPointsPerClass={item.learningPointsPerClass}
-              open={outlineOpen}
-              onToggle={onToggleOutline}
-            />
-            <BatchMeta courseId={item.courseId} />
-          </>
-        ) : null}
-
-        {children ? <div className="mt-5 flex flex-wrap items-center gap-2">{children}</div> : null}
       </div>
     </article>
   );
+
 }
