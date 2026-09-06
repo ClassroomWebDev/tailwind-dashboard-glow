@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TablePagination, usePagination } from "@/components/TablePagination";
 import { SESSION_TYPE_LABELS, type SessionType } from "@/lib/schedule";
 import { SeasonFilter, useSeasonFilter } from "@/components/SeasonFilter";
 import { Input } from "@/components/ui/input";
@@ -345,20 +346,44 @@ function MyAttendanceLog() {
       courses: { name: string; learning_points_per_class: number } | null;
     } | null;
   }>;
+  const [term, setTerm] = useState("");
   const sorted = [...rows].sort((a, b) =>
     (b.class_sessions?.session_date ?? "").localeCompare(a.class_sessions?.session_date ?? ""),
   );
+  const q = term.trim().toLowerCase();
+  const filtered = q
+    ? sorted.filter((r) =>
+        [
+          r.class_sessions?.session_date,
+          r.class_sessions?.title,
+          r.class_sessions?.courses?.name,
+          r.class_sessions?.session_type,
+        ]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q)),
+      )
+    : sorted;
+  const pagination = usePagination(filtered);
 
   return (
     <section className="space-y-4">
-      <h2 className="font-display text-xl font-semibold">Date-wise attended classes</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold">Date-wise attended classes</h2>
+        <Input
+          className="w-full sm:w-72"
+          placeholder="Search date, class, topic or course…"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+      </div>
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
-      ) : sorted.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
           No attendance recorded yet.
         </p>
       ) : (
+        <div>
         <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
           <table className="w-full text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -372,7 +397,7 @@ function MyAttendanceLog() {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((r) => (
+              {pagination.rows.map((r) => (
                 <tr key={r.id} className="border-t border-border">
                   <td className="px-4 py-3">{r.class_sessions?.session_date ?? "—"}</td>
                   <td className="px-4 py-3 font-medium">{r.class_sessions?.title ?? "—"}</td>
@@ -392,6 +417,8 @@ function MyAttendanceLog() {
               ))}
             </tbody>
           </table>
+        </div>
+        <TablePagination pagination={pagination} label="classes" />
         </div>
       )}
     </section>

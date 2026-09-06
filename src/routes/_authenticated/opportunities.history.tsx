@@ -15,7 +15,32 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { TablePagination, usePagination } from "@/components/TablePagination";
 import { formatDateTime } from "@/lib/format";
+
+/** Newest submissions first. */
+const newestFirst = (rows: Sale[]) => [...rows].sort((a, b) => b.created_at.localeCompare(a.created_at));
+
+/** Live keyword match across the fields staff search by. */
+function matchesSale(s: Sale, term: string, courseLabel: string, ...extra: (string | null | undefined)[]) {
+  const q = term.trim().toLowerCase();
+  if (!q) return true;
+  return [
+    s.order_no,
+    s.invoice_no,
+    s.tx_id,
+    s.payment_ref,
+    s.payment_method,
+    s.student_name,
+    s.student_mobile,
+    s.student_institution,
+    s.status,
+    courseLabel,
+    ...extra,
+  ]
+    .filter(Boolean)
+    .some((v) => String(v).toLowerCase().includes(q));
+}
 
 export const Route = createFileRoute("/_authenticated/opportunities/history")({
   head: () => ({
@@ -113,7 +138,8 @@ function OpportunitiesHistoryPage() {
 /* ------------------------------- KPI cards ------------------------------- */
 
 function Kpis({ rows }: { rows: Sale[] }) {
-  const live = rows.filter((s) => !s.deleted_at && s.status !== "rejected");
+  // Only verified (approved) opportunities count towards any total.
+  const live = rows.filter((s) => !s.deleted_at && s.status === "approved");
   const today = shiftDay(0);
   const yesterday = shiftDay(-1);
   const sevenAgo = shiftDay(-6);
@@ -143,7 +169,7 @@ function Kpis({ rows }: { rows: Sale[] }) {
           <p className="mt-2 font-display text-2xl font-bold" style={{ color: BRAND_RED }}>
             {money(c.amount)}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{c.count} opportunities</p>
+          <p className="mt-1 text-xs text-muted-foreground">{c.count} approved opportunities</p>
         </article>
       ))}
     </section>
@@ -161,7 +187,7 @@ const RANGES = [
 function SalesChart({ rows }: { rows: Sale[] }) {
   const [range, setRange] = useState<(typeof RANGES)[number]["key"]>("7");
   const [mode, setMode] = useState<"area" | "bar">("area");
-  const live = rows.filter((s) => !s.deleted_at && s.status !== "rejected");
+  const live = rows.filter((s) => !s.deleted_at && s.status === "approved");
 
   const data = useMemo(() => {
     const days = RANGES.find((r) => r.key === range)?.days ?? 0;
@@ -266,41 +292,57 @@ function ScopedTable({
   showAmbassador: boolean;
 }) {
   const courseName = useCourseName();
+  const [term, setTerm] = useState("");
+  const sorted = useMemo(() => newestFirst(rows), [rows]);
+  const filtered = useMemo(() => sorted.filter((s) => matchesSale(s, term, courseName(s))), [sorted, term, courseName]);
+  const pagination = usePagination(filtered);
+
   return (
     <section className="space-y-4">
-      <h2 className="font-display text-xl font-semibold">{showAmbassador ? "Team sales" : "My sales"}</h2>
-      {rows.length === 0 ? (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold">{showAmbassador ? "Team sales" : "My sales"}</h2>
+        <Input
+          className="w-full sm:w-72"
+          placeholder="Search order, opportunity, student…"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+      </div>
+      {filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
           No opportunities recorded yet.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
-          <table className="w-full min-w-[720px] text-sm">
-            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Submitted</th>
-                <th className="px-4 py-3">Order ID</th>
-                <th className="px-4 py-3">Course</th>
-                <th className="px-4 py-3">Amount</th>
-                {showAmbassador ? <th className="px-4 py-3">Ambassador</th> : null}
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((s) => (
-                <tr key={s.id} className="border-t border-border">
-                  <td className="px-4 py-3 text-muted-foreground">{formatDateTime(s.created_at)}</td>
-                  <td className="px-4 py-3">{s.order_no ?? "—"}</td>
-                  <td className="px-4 py-3">{courseName(s)}</td>
-                  <td className="px-4 py-3 font-medium">{money(Number(s.amount))}</td>
-                  {showAmbassador ? <td className="px-4 py-3">{nameWithId(people?.[s.ambassador_id])}</td> : null}
-                  <td className="px-4 py-3">
-                    <StatusBadge status={s.status} />
-                  </td>
+        <div>
+          <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Submitted</th>
+                  <th className="px-4 py-3">Order ID</th>
+                  <th className="px-4 py-3">Opportunity</th>
+                  <th className="px-4 py-3">Amount</th>
+                  {showAmbassador ? <th className="px-4 py-3">Ambassador</th> : null}
+                  <th className="px-4 py-3">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pagination.rows.map((s) => (
+                  <tr key={s.id} className="border-t border-border">
+                    <td className="px-4 py-3 text-muted-foreground">{formatDateTime(s.created_at)}</td>
+                    <td className="px-4 py-3">{s.order_no ?? "—"}</td>
+                    <td className="px-4 py-3">{courseName(s)}</td>
+                    <td className="px-4 py-3 font-medium">{money(Number(s.amount))}</td>
+                    {showAmbassador ? <td className="px-4 py-3">{nameWithId(people?.[s.ambassador_id])}</td> : null}
+                    <td className="px-4 py-3">
+                      <StatusBadge status={s.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <TablePagination pagination={pagination} label="opportunities" />
         </div>
       )}
     </section>
@@ -438,69 +480,59 @@ function FacultyPanel({ rows, people }: { rows: Sale[]; people: Record<string, P
 
 /* --------------------------- Governance (staff) -------------------------- */
 
-function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string, PersonRow> | undefined }) {
-  const courseName = useCourseName();
-  const queryClient = useQueryClient();
-  const [busy, setBusy] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Sale | null>(null);
+type GovActions = {
+  busy: string | null;
+  onEdit: (s: Sale) => void;
+  onDecide: (s: Sale, status: "approved" | "rejected" | "pending") => void;
+  onTrash: (s: Sale) => void;
+  onRestore: (s: Sale) => void;
+  onPurge: (s: Sale) => void;
+};
 
-  const live = rows.filter((s) => !s.deleted_at);
-  const groups = {
-    pending: live.filter((s) => s.status === "pending"),
-    approved: live.filter((s) => s.status === "approved"),
-    rejected: live.filter((s) => s.status === "rejected"),
-    trash: rows.filter((s) => !!s.deleted_at),
-  };
+/** One governance tab: keyword filtered, newest first, paginated. */
+function GovRows({
+  items,
+  trashed,
+  term,
+  people,
+  courseName,
+  actions,
+}: {
+  items: Sale[];
+  trashed: boolean;
+  term: string;
+  people: Record<string, PersonRow> | undefined;
+  courseName: (s: Sale) => string;
+  actions: GovActions;
+}) {
+  const { busy } = actions;
+  const filtered = useMemo(
+    () =>
+      newestFirst(items).filter((s) => {
+        const amb = people?.[s.ambassador_id];
+        const coord = amb?.coordinator_id ? people?.[amb.coordinator_id] : undefined;
+        return matchesSale(s, term, courseName(s), amb?.full_name, amb?.auto_id, coord?.full_name, coord?.auto_id);
+      }),
+    [items, term, people, courseName],
+  );
+  const pagination = usePagination(filtered);
 
-  function refresh() {
-    void queryClient.invalidateQueries({ queryKey: ["sales"] });
-    void queryClient.invalidateQueries({ queryKey: ["pending-sales-count"] });
-    void queryClient.invalidateQueries({ queryKey: ["profile"] });
-    void queryClient.invalidateQueries({ queryKey: ["leaderboard-ambassadors"] });
-  }
-
-  async function run(id: string, action: () => PromiseLike<{ error: { message: string } | null }>, ok: string) {
-    setBusy(id);
-    const { error } = await action();
-    setBusy(null);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(ok);
-    refresh();
-  }
-
-  const decide = async (s: Sale, status: "approved" | "rejected") => {
-    const { data: userData } = await supabase.auth.getUser();
-    await run(
-      s.id,
-      () =>
-        supabase
-          .from("sales")
-          .update({
-            status,
-            approved_by: status === "approved" ? (userData.user?.id ?? null) : null,
-            approved_at: status === "approved" ? new Date().toISOString() : null,
-          })
-          .eq("id", s.id),
-      status === "approved" ? "Approved — leadership points awarded" : "Opportunity rejected",
-    );
-  };
-
-  const Table = ({ items, trashed }: { items: Sale[]; trashed: boolean }) =>
-    items.length === 0 ? (
+  if (filtered.length === 0)
+    return (
       <p className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
         Nothing here yet.
       </p>
-    ) : (
+    );
+
+  return (
+    <div>
       <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
         <table className="w-full min-w-[1100px] text-sm">
           <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Submitted</th>
               <th className="px-4 py-3">Order ID</th>
-              <th className="px-4 py-3">Course</th>
+              <th className="px-4 py-3">Opportunity</th>
               <th className="px-4 py-3">Amount</th>
               <th className="px-4 py-3">Payment</th>
               <th className="px-4 py-3">Ambassador</th>
@@ -510,7 +542,7 @@ function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string
             </tr>
           </thead>
           <tbody>
-            {items.map((s) => {
+            {pagination.rows.map((s) => {
               const amb = people?.[s.ambassador_id];
               const coord = amb?.coordinator_id ? people?.[amb.coordinator_id] : undefined;
               return (
@@ -540,13 +572,7 @@ function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string
                             size="sm"
                             variant="secondary"
                             disabled={busy === s.id}
-                            onClick={() =>
-                              void run(
-                                s.id,
-                                () => supabase.from("sales").update({ deleted_at: null }).eq("id", s.id),
-                                "Opportunity restored",
-                              )
-                            }
+                            onClick={() => actions.onRestore(s)}
                           >
                             <RotateCcw className="size-3.5" /> Restore
                           </Button>
@@ -554,54 +580,41 @@ function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string
                             size="sm"
                             variant="destructive"
                             disabled={busy === s.id}
-                            onClick={() => {
-                              if (!window.confirm("Permanently delete this opportunity? This cannot be undone.")) return;
-                              void run(
-                                s.id,
-                                () => supabase.from("sales").delete().eq("id", s.id),
-                                "Opportunity permanently deleted",
-                              );
-                            }}
+                            onClick={() => actions.onPurge(s)}
                           >
                             <Trash2 className="size-3.5" /> Delete forever
                           </Button>
                         </>
                       ) : (
                         <>
-                          <Button size="sm" variant="outline" onClick={() => setEditing(s)}>
+                          <Button size="sm" variant="outline" onClick={() => actions.onEdit(s)}>
                             <Pencil className="size-3.5" /> Edit
                           </Button>
-                          {s.status !== "approved" ? (
-                            <Button size="sm" disabled={busy === s.id} onClick={() => void decide(s, "approved")}>
+                          {s.status === "approved" ? (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              disabled={busy === s.id}
+                              onClick={() => actions.onDecide(s, "pending")}
+                            >
+                              <RotateCcw className="size-3.5" /> Revert to pending
+                            </Button>
+                          ) : (
+                            <Button size="sm" disabled={busy === s.id} onClick={() => actions.onDecide(s, "approved")}>
                               <BadgeCheck className="size-3.5" /> Approve
                             </Button>
-                          ) : null}
+                          )}
                           {s.status !== "rejected" ? (
                             <Button
                               size="sm"
                               variant="ghost"
                               disabled={busy === s.id}
-                              onClick={() => void decide(s, "rejected")}
+                              onClick={() => actions.onDecide(s, "rejected")}
                             >
                               <XCircle className="size-3.5" /> Reject
                             </Button>
                           ) : null}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            disabled={busy === s.id}
-                            onClick={() =>
-                              void run(
-                                s.id,
-                                () =>
-                                  supabase
-                                    .from("sales")
-                                    .update({ deleted_at: new Date().toISOString() })
-                                    .eq("id", s.id),
-                                "Opportunity moved to trash",
-                              )
-                            }
-                          >
+                          <Button size="sm" variant="ghost" disabled={busy === s.id} onClick={() => actions.onTrash(s)}>
                             <Trash2 className="size-3.5" /> Trash
                           </Button>
                         </>
@@ -614,11 +627,97 @@ function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string
           </tbody>
         </table>
       </div>
+      <TablePagination pagination={pagination} label="opportunities" />
+    </div>
+  );
+}
+
+function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string, PersonRow> | undefined }) {
+  const courseName = useCourseName();
+  const queryClient = useQueryClient();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Sale | null>(null);
+  const [term, setTerm] = useState("");
+
+  const live = rows.filter((s) => !s.deleted_at);
+  const groups = {
+    pending: live.filter((s) => s.status === "pending"),
+    approved: live.filter((s) => s.status === "approved"),
+    rejected: live.filter((s) => s.status === "rejected"),
+    trash: rows.filter((s) => !!s.deleted_at),
+  };
+
+  function refresh() {
+    void queryClient.invalidateQueries({ queryKey: ["sales"] });
+    void queryClient.invalidateQueries({ queryKey: ["pending-sales-count"] });
+    void queryClient.invalidateQueries({ queryKey: ["profile"] });
+    void queryClient.invalidateQueries({ queryKey: ["leaderboard-ambassadors"] });
+  }
+
+  async function run(id: string, action: () => PromiseLike<{ error: { message: string } | null }>, ok: string) {
+    setBusy(id);
+    const { error } = await action();
+    setBusy(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(ok);
+    refresh();
+  }
+
+  const decide = async (s: Sale, status: "approved" | "rejected" | "pending") => {
+    const { data: userData } = await supabase.auth.getUser();
+    await run(
+      s.id,
+      () =>
+        supabase
+          .from("sales")
+          .update({
+            status,
+            approved_by: status === "approved" ? (userData.user?.id ?? null) : null,
+            approved_at: status === "approved" ? new Date().toISOString() : null,
+          })
+          .eq("id", s.id),
+      status === "approved"
+        ? "Approved — leadership points awarded"
+        : status === "pending"
+          ? "Reverted to pending — removed from approved totals"
+          : "Opportunity rejected",
     );
+  };
+
+  const actions: GovActions = {
+    busy,
+    onEdit: setEditing,
+    onDecide: (s, status) => void decide(s, status),
+    onTrash: (s) =>
+      void run(
+        s.id,
+        () => supabase.from("sales").update({ deleted_at: new Date().toISOString() }).eq("id", s.id),
+        "Opportunity moved to trash",
+      ),
+    onRestore: (s) =>
+      void run(s.id, () => supabase.from("sales").update({ deleted_at: null }).eq("id", s.id), "Opportunity restored"),
+    onPurge: (s) => {
+      if (!window.confirm("Permanently delete this opportunity? This cannot be undone.")) return;
+      void run(s.id, () => supabase.from("sales").delete().eq("id", s.id), "Opportunity permanently deleted");
+    },
+  };
+
+  const tabProps = { term, people, courseName, actions };
 
   return (
     <section className="space-y-4">
-      <h2 className="font-display text-xl font-semibold">Opportunity governance</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold">Opportunity governance</h2>
+        <Input
+          className="w-full sm:w-80"
+          placeholder="Search order, opportunity, student, member ID…"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+      </div>
       <Tabs defaultValue="pending">
         <TabsList>
           <TabsTrigger value="pending">Pending ({groups.pending.length})</TabsTrigger>
@@ -627,16 +726,16 @@ function GovernanceTable({ rows, people }: { rows: Sale[]; people: Record<string
           <TabsTrigger value="trash">Trash ({groups.trash.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="pending" className="mt-4">
-          <Table items={groups.pending} trashed={false} />
+          <GovRows items={groups.pending} trashed={false} {...tabProps} />
         </TabsContent>
         <TabsContent value="approved" className="mt-4">
-          <Table items={groups.approved} trashed={false} />
+          <GovRows items={groups.approved} trashed={false} {...tabProps} />
         </TabsContent>
         <TabsContent value="rejected" className="mt-4">
-          <Table items={groups.rejected} trashed={false} />
+          <GovRows items={groups.rejected} trashed={false} {...tabProps} />
         </TabsContent>
         <TabsContent value="trash" className="mt-4">
-          <Table items={groups.trash} trashed />
+          <GovRows items={groups.trash} trashed {...tabProps} />
         </TabsContent>
       </Tabs>
 

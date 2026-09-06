@@ -13,6 +13,7 @@ import {
   LifeBuoy,
   LogOut,
   Megaphone,
+  Heart,
   Share2,
   Rocket,
   Menu,
@@ -26,10 +27,11 @@ import {
   Info,
   X,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRole, useProfile } from "@/hooks/useProfile";
 import { DEFAULT_BRAND_TITLE, useProgramSettings } from "@/hooks/useBusiness";
+import { markSectionSeen, useSectionUpdates, type Section } from "@/hooks/useSectionUpdates";
 import { ROLE_LABELS, type AppRole } from "@/lib/types";
 
 type NavItem = {
@@ -41,6 +43,7 @@ type NavItem = {
     | "/opportunities/create"
     | "/opportunities/history"
     | "/opportunity-seeker"
+    | "/success-story"
     | "/leaderboard"
     | "/users"
     | "/notices"
@@ -61,6 +64,8 @@ type NavItem = {
   key?: string;
   /** Optional live counter shown as a badge. */
   badge?: "pending-sales";
+  /** Section tracked for the "NEW" badge. */
+  section?: Section;
 };
 
 function navForRole(role: AppRole | undefined): NavItem[] {
@@ -68,8 +73,14 @@ function navForRole(role: AppRole | undefined): NavItem[] {
   const profile: NavItem = { to: "/profile", label: "Profile", icon: UserRoundCog };
   const support: NavItem = { to: "/support", label: "Support", icon: LifeBuoy };
   const leaderboard: NavItem = { to: "/leaderboard", label: "Leaderboard", icon: Trophy };
-  const notices: NavItem = { to: "/notices", label: "Notice Board", icon: Megaphone };
-  const events: NavItem = { to: "/events", label: "Events", icon: CalendarDays };
+  const notices: NavItem = { to: "/notices", label: "Notice Board", icon: Megaphone, section: "notices" };
+  const events: NavItem = { to: "/events", label: "Events", icon: CalendarDays, section: "events" };
+  const successStory: NavItem = {
+    to: "/success-story",
+    label: "Success Story",
+    icon: Heart,
+    section: "success-story",
+  };
   const calendar: NavItem = { to: "/calendar", label: "Calendar", icon: CalendarRange };
   const certificates: NavItem = { to: "/certificates", label: "Certificates", icon: Award };
   const reviews: NavItem = { to: "/reviews", label: "Reviews", icon: Star };
@@ -79,13 +90,16 @@ function navForRole(role: AppRole | undefined): NavItem[] {
 
   const courses: NavItem = { to: "/courses", label: "Courses", icon: BookOpen };
   const opportunityCreate: NavItem = { to: "/opportunities/create", label: "Opportunity Create", icon: FilePlus2 };
-  const opportunityHistory: NavItem = { to: "/opportunities/history", label: "Opportunities History", icon: History };
+  const opportunityHistory = (badge: boolean): NavItem =>
+    badge
+      ? { to: "/opportunities/history", label: "Opportunities History", icon: History, badge: "pending-sales" }
+      : { to: "/opportunities/history", label: "Opportunities History", icon: History };
   const opportunitySeeker: NavItem = { to: "/opportunity-seeker", label: "Opportunity Seeker", icon: UserSearch };
 
   const attendance: NavItem = { to: "/attendance", label: "Attendance Log", icon: CalendarCheck };
   const myOpportunities = (badge: boolean): NavItem =>
     badge
-      ? { to: "/sales", label: "My Opportunities", icon: ReceiptText, badge: "pending-sales" }
+      ? { to: "/sales", label: "My Opportunities", icon: ReceiptText }
       : { to: "/sales", label: "My Opportunities", icon: ReceiptText };
 
   // Group 1 — overview | Group 2 — opportunities | Group 3 — programme | Group 4 — organisation
@@ -93,10 +107,10 @@ function navForRole(role: AppRole | undefined): NavItem[] {
     myOpportunities(badge),
     bigOpportunity,
     opportunityCreate,
-    opportunityHistory,
+    opportunityHistory(badge),
     opportunitySeeker,
   ];
-  const group4 = [branding, notices, about, support, profile];
+  const group4 = [successStory, branding, notices, about, support, profile];
 
   if (role === "admin" || role === "support_manager") {
     return [
@@ -161,7 +175,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const NAV = navForRole(role);
   const isAdminOrManager = role === "admin" || role === "support_manager";
   const { data: pendingSales } = usePendingSalesCount(isAdminOrManager);
+  const updates = useSectionUpdates();
   const badgeCount = (item: NavItem) => (item.badge === "pending-sales" ? (pendingSales ?? 0) : 0);
+  const isNew = (item: NavItem) => !!item.section && updates[item.section];
+
+  // Opening a tracked section clears its NEW badge.
+  useEffect(() => {
+    const map: Record<string, Section> = {
+      "/notices": "notices",
+      "/events": "events",
+      "/success-story": "success-story",
+    };
+    const section = map[path];
+    if (section) markSectionSeen(section);
+  }, [path]);
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -193,6 +220,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               {badgeCount(item) > 0 ? (
                 <span className="grid min-w-5 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-[0.7rem] font-bold text-white">
                   {badgeCount(item)}
+                </span>
+              ) : null}
+              {isNew(item) ? (
+                <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-white">
+                  New
                 </span>
               ) : null}
             </Link>
@@ -264,6 +296,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {badgeCount(item) > 0 ? (
                   <span className="grid min-w-5 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-[0.7rem] font-bold text-white">
                     {badgeCount(item)}
+                  </span>
+                ) : null}
+                {isNew(item) ? (
+                  <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-white">
+                    New
                   </span>
                 ) : null}
               </Link>
