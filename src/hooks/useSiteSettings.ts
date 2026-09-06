@@ -15,6 +15,23 @@ export type AuthCopyValue = {
   subtitle: string;
 };
 
+export type HeaderValue = {
+  logo_url: string;
+  logo_height: number;
+  show_brand_text: boolean;
+  brand_title: string;
+  brand_tagline: string;
+  nav_links: FooterLink[];
+  show_login: boolean;
+  login_label: string;
+  show_register: boolean;
+  register_label: string;
+  register_url: string;
+  show_contact: boolean;
+  contact_label: string;
+  contact_url: string;
+};
+
 export type FooterValue = {
   brand_title: string;
   logo_url: string;
@@ -31,8 +48,10 @@ export type FooterValue = {
 export type SiteSettings = {
   brand: BrandSettingsValue;
   auth: AuthCopyValue;
+  header: HeaderValue;
   footer: FooterValue;
 };
+
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   brand: {
