@@ -8,6 +8,9 @@ export type BatchState = "running" | "upcoming" | "finished";
  * The estimated end is derived from total classes divided by the weekly class days.
  */
 export function batchState(batch: Batch, today = isoDate(new Date())): BatchState {
+  const manual = (batch as { status?: string | null }).status;
+  if (manual === "completed") return "finished";
+  if (manual === "running") return "running";
   const start = (batch.start_date ?? "").slice(0, 10);
   if (!start) return "finished";
   if (start > today) return "upcoming";

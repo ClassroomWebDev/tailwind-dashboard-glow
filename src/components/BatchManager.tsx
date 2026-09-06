@@ -105,6 +105,7 @@ export function BatchManager({ courseId, courseName, classQuantity }: Props) {
         days_of_week: form.days,
         total_classes: Number(form.total_classes) || 0,
         community_link: form.community_link.trim() || null,
+        status: form.start_date > today() ? "upcoming" : "running",
         created_by: uid,
       })
       .select()
