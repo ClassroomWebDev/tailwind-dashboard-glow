@@ -188,6 +188,7 @@ export type Database = {
           regular_price: number
           sort_order: number
           student_price: number
+          thumbnail_url: string | null
           title: string
           updated_at: string
         }
@@ -207,6 +208,7 @@ export type Database = {
           regular_price?: number
           sort_order?: number
           student_price?: number
+          thumbnail_url?: string | null
           title: string
           updated_at?: string
         }
@@ -226,6 +228,7 @@ export type Database = {
           regular_price?: number
           sort_order?: number
           student_price?: number
+          thumbnail_url?: string | null
           title?: string
           updated_at?: string
         }
@@ -540,6 +543,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           details: string | null
+          display_order: number
           end_date: string | null
           has_certificate: boolean
           id: string
@@ -551,6 +555,7 @@ export type Database = {
           season_id: string | null
           start_date: string | null
           student_price: number
+          thumbnail_url: string | null
           updated_at: string
         }
         Insert: {
@@ -561,6 +566,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           details?: string | null
+          display_order?: number
           end_date?: string | null
           has_certificate?: boolean
           id?: string
@@ -572,6 +578,7 @@ export type Database = {
           season_id?: string | null
           start_date?: string | null
           student_price?: number
+          thumbnail_url?: string | null
           updated_at?: string
         }
         Update: {
@@ -582,6 +589,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           details?: string | null
+          display_order?: number
           end_date?: string | null
           has_certificate?: boolean
           id?: string
@@ -593,6 +601,7 @@ export type Database = {
           season_id?: string | null
           start_date?: string | null
           student_price?: number
+          thumbnail_url?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1722,6 +1731,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_master_reset: { Args: never; Returns: string }
+      admin_reset_ambassadors: { Args: never; Returns: string }
+      admin_reset_coordinators: { Args: never; Returns: string }
+      admin_reset_faculty: { Args: never; Returns: string }
+      admin_reset_managers: { Args: never; Returns: string }
+      admin_reset_season: { Args: { _season_id: string }; Returns: string }
+      assert_admin: { Args: never; Returns: undefined }
       bump_success_story_views: {
         Args: { _story_id: string }
         Returns: undefined
