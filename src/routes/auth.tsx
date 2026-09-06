@@ -197,7 +197,24 @@ function AuthPage() {
                     ? "Create account"
                     : "Send reset link"}
             </Button>
+
+            {copy.helpline_text || copy.helpline_phone ? (
+              <p className="rounded-xl border border-primary/20 bg-accent/60 px-3 py-2 text-center text-xs leading-relaxed text-muted-foreground">
+                {copy.helpline_text}{" "}
+                {copy.helpline_phone ? (
+                  <a
+                    href={helplineHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    {copy.helpline_phone}
+                  </a>
+                ) : null}
+              </p>
+            ) : null}
           </form>
+
 
           <div className="mt-6 space-y-2 text-sm">
             {mode === "login" ? (
