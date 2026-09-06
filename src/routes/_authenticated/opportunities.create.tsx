@@ -298,7 +298,9 @@ function OpportunityEntry() {
         </div>
 
         <div className="grid gap-1.5">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">CREDITED TO *</Label>
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {role === "coordinator" ? "CREDIT OPPORTUNITY TO *" : "CREDITED TO *"}
+          </Label>
           {selfOnly ? (
             <Input
               value={`${profile?.full_name ?? "Me"} (${profile?.auto_id ?? "—"})`}
@@ -312,7 +314,9 @@ function OpportunityEntry() {
               onChange={(e) => setAmbassadorId(e.target.value)}
               className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
             >
-              <option value="">Myself ({profile?.full_name ?? "me"})</option>
+              <option value="">
+                {role === "coordinator" ? "Select an ambassador" : `Myself (${profile?.full_name ?? "me"})`}
+              </option>
               {ambassadorOptions.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.full_name || "Member"} ({m.auto_id ?? "—"})
