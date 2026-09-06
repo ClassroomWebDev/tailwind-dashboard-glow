@@ -836,6 +836,23 @@ function EditSaleDialog({ sale, onClose, onSaved }: { sale: Sale | null; onClose
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Payment reference</Label>
             <Input value={form.payment_ref} onChange={(e) => setForm({ ...form, payment_ref: e.target.value })} />
           </div>
+          <div className="rounded-2xl border border-border bg-muted/50 p-3 text-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Payment verification</p>
+            <p className="mt-1">Gateway: {sale?.payment_method || "—"}</p>
+            {sale?.payment_account_number ? <p>Receiving number: {sale.payment_account_number}</p> : null}
+            {sale?.sender_account ? <p>Sender number: {sale.sender_account}</p> : null}
+            <p>TrxID: {sale?.payment_ref || "—"}</p>
+            {sale?.payment_proof_url ? (
+              <a
+                href={sale.payment_proof_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 inline-block font-semibold text-primary underline underline-offset-2"
+              >
+                View payment receipt
+              </a>
+            ) : null}
+          </div>
           <div className="grid gap-1.5">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Notes</Label>
             <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
