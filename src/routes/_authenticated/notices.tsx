@@ -349,7 +349,7 @@ function NoticesPage() {
                         type="button"
                         onClick={() => setDraft({ ...draft, targetUserId: m.id })}
                         className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm ${
-                          draft.targetUserId === m.id ? "bg-primary/10 font-semibold" : "hover:bg-muted"
+                          draft.targetUserId === m.id ? "bg-primary/10 font-semibold" : "hover:bg-accent"
                         }`}
                       >
                         <span>{m.full_name}</span>

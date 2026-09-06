@@ -211,7 +211,7 @@ function ApplyPage() {
               {helpline ? (
                 <a
                   href={`tel:${helpline}`}
-                  className="inline-flex items-center gap-2 rounded-xl border border-border px-3.5 py-2 text-sm font-semibold transition hover:bg-muted"
+                  className="inline-flex items-center gap-2 rounded-xl border border-border px-3.5 py-2 text-sm font-semibold transition hover:bg-accent"
                 >
                   <Phone className="size-4" /> {helpline}
                 </a>

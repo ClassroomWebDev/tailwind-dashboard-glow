@@ -25,7 +25,7 @@ export function CourseOutlineViewer({ courseId, learningPointsPerClass, open, on
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-muted/60"
+        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-accent"
       >
         <BookOpen className="size-4 shrink-0 text-primary" />
         <span className="min-w-0 flex-1 font-display text-sm font-semibold">
@@ -48,7 +48,7 @@ export function CourseOutlineViewer({ courseId, learningPointsPerClass, open, on
                 type="button"
                 aria-expanded={expanded}
                 onClick={() => setOpenId(expanded ? null : topic.id)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-muted/60"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-accent"
               >
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
                   {index + 1}
