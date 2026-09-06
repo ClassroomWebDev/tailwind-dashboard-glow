@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -73,7 +73,7 @@ function CmsPage() {
   );
 }
 
-type CmsPane = { value: string; label: string; render: (isAdmin: boolean) => React.ReactNode };
+type CmsPane = { value: string; label: string; render: (isAdmin: boolean) => ReactNode };
 
 const CMS_GROUPS: { id: string; label: string; panes: CmsPane[] }[] = [
   {
