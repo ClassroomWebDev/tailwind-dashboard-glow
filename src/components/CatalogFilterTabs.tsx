@@ -36,7 +36,8 @@ export function CatalogFilterTabs({
           aria-selected={value === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "rounded-xl px-3.5 py-1.5 text-xs font-bold transition",
+            "shrink-0 snap-start whitespace-nowrap rounded-xl px-3.5 py-1.5 text-xs font-bold transition",
+
             value === o.value
               ? "bg-brand-red text-brand-red-foreground shadow-sm"
               : "text-muted-foreground hover:bg-brand-red/10 hover:text-foreground",
