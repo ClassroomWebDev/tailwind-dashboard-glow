@@ -175,7 +175,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const NAV = navForRole(role);
   const isAdminOrManager = role === "admin" || role === "support_manager";
   const { data: pendingSales } = usePendingSalesCount(isAdminOrManager);
+  const updates = useSectionUpdates();
   const badgeCount = (item: NavItem) => (item.badge === "pending-sales" ? (pendingSales ?? 0) : 0);
+  const isNew = (item: NavItem) => !!item.section && updates[item.section];
+
+  // Opening a tracked section clears its NEW badge.
+  useEffect(() => {
+    const map: Record<string, Section> = {
+      "/notices": "notices",
+      "/events": "events",
+      "/success-story": "success-story",
+    };
+    const section = map[path];
+    if (section) markSectionSeen(section);
+  }, [path]);
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -207,6 +220,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               {badgeCount(item) > 0 ? (
                 <span className="grid min-w-5 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-[0.7rem] font-bold text-white">
                   {badgeCount(item)}
+                </span>
+              ) : null}
+              {isNew(item) ? (
+                <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-white">
+                  New
                 </span>
               ) : null}
             </Link>
@@ -278,6 +296,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {badgeCount(item) > 0 ? (
                   <span className="grid min-w-5 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-[0.7rem] font-bold text-white">
                     {badgeCount(item)}
+                  </span>
+                ) : null}
+                {isNew(item) ? (
+                  <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-white">
+                    New
                   </span>
                 ) : null}
               </Link>
