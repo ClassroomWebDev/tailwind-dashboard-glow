@@ -33,6 +33,7 @@ import { useMyRole, useProfile } from "@/hooks/useProfile";
 import { DEFAULT_BRAND_TITLE, useProgramSettings } from "@/hooks/useBusiness";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { SafeImage } from "@/components/ImageInput";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { markSectionSeen, useSectionUpdates, type Section } from "@/hooks/useSectionUpdates";
 import { ROLE_LABELS, type AppRole } from "@/lib/types";
 
@@ -203,8 +204,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Desktop side navigation */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-sidebar px-5 py-7 text-sidebar-foreground lg:flex">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <Brand />
+          <ThemeToggle className="border-sidebar-border/60 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
         </div>
         <nav className="mt-8 flex flex-1 flex-col gap-1">
           {NAV.map((item) => (
@@ -239,6 +241,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 flex items-center justify-between bg-sidebar px-4 py-3 text-sidebar-foreground lg:hidden">
         <Brand />
         <div className="flex items-center gap-1">
+          <ThemeToggle className="border-sidebar-border/60 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <button
             type="button"
             aria-label="Open menu"
