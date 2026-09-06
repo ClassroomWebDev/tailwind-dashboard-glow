@@ -113,7 +113,8 @@ function OpportunitiesHistoryPage() {
 /* ------------------------------- KPI cards ------------------------------- */
 
 function Kpis({ rows }: { rows: Sale[] }) {
-  const live = rows.filter((s) => !s.deleted_at && s.status !== "rejected");
+  // Only verified (approved) opportunities count towards any total.
+  const live = rows.filter((s) => !s.deleted_at && s.status === "approved");
   const today = shiftDay(0);
   const yesterday = shiftDay(-1);
   const sevenAgo = shiftDay(-6);
