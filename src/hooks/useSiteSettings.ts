@@ -70,6 +70,7 @@ export type SiteSettings = {
   auth: AuthCopyValue;
   header: HeaderValue;
   footer: FooterValue;
+  popup: PopupValue;
 };
 
 
@@ -83,7 +84,25 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     title: "One profile. One support line.",
     subtitle:
       "Keep your member profile at 100% and stay connected with your coordinator, mentor and support manager.",
+    left_logo_url: "",
+    left_logo_height: 48,
+    left_title_size: "lg",
+    left_body_size: "md",
+    bottom_text: "Policy compliant member access",
+    right_logo_url: "",
+    right_logo_height: 40,
+    helpline_text:
+      "লগইন করতে কোনো সমস্যা হলে আমাদের হেল্পলাইনে যোগাযোগ করুন / Having trouble signing in? Contact our helpline:",
+    helpline_phone: "",
   },
+  popup: {
+    enabled: false,
+    image_url: "",
+    title: "",
+    description: "",
+    helpline: "",
+  },
+
   header: {
     logo_url: "",
     logo_height: 48,
