@@ -88,6 +88,7 @@ function OpportunityEntry() {
   const [studentName, setStudentName] = useState("");
   const [studentMobile, setStudentMobile] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
+  const [studentFacebook, setStudentFacebook] = useState("");
   const [studentInstitution, setStudentInstitution] = useState("");
   const [studentDistrict, setStudentDistrict] = useState("");
   const [gatewayId, setGatewayId] = useState("");
@@ -138,6 +139,7 @@ function OpportunityEntry() {
     setStudentName("");
     setStudentMobile("");
     setStudentEmail("");
+    setStudentFacebook("");
     setStudentInstitution("");
     setStudentDistrict("");
     setGatewayId("");
@@ -190,6 +192,7 @@ function OpportunityEntry() {
       student_name: studentName.trim(),
       student_mobile: studentMobile.trim(),
       student_email: studentEmail.trim() || null,
+      facebook_url: studentFacebook.trim() || null,
       student_institution: studentInstitution.trim() || null,
       student_district: studentDistrict.trim() || null,
       payment_method: gatewayLabel(gateway),
@@ -339,6 +342,16 @@ function OpportunityEntry() {
           <Input type="email" value={studentEmail} onChange={(e) => setStudentEmail(e.target.value)} />
         </div>
         <div className="grid gap-1.5">
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Student facebook
+          </Label>
+          <Input
+            value={studentFacebook}
+            onChange={(e) => setStudentFacebook(e.target.value)}
+            placeholder="https://facebook.com/username"
+          />
+        </div>
+        <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institution *</Label>
           <Input value={studentInstitution} onChange={(e) => setStudentInstitution(e.target.value)} />
         </div>
@@ -368,12 +381,12 @@ function OpportunityEntry() {
 
         <div className="grid gap-1.5">
           <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Transaction ID / reference
+            Sender account number Or, Transaction ID
           </Label>
           <Input
             value={paymentRef}
             onChange={(e) => setPaymentRef(e.target.value)}
-            placeholder="TrxID / bank transaction number"
+            placeholder="Enter sender number or TrxID / reference"
           />
         </div>
 
