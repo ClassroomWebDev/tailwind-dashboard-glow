@@ -17,7 +17,14 @@ import { CompanyWingsAdmin, LogoBoardsAdmin } from "@/components/EcosystemAdmin"
 import { ReviewsModeration } from "@/components/ReviewsModeration";
 import { BrandSettings } from "@/components/BrandSettings";
 import { ImageInput } from "@/components/ImageInput";
-import { AuthCopyAdmin, FooterAdmin, HeaderAdmin, SiteIdentityAdmin } from "@/components/SiteCmsAdmin";
+import {
+  AuthCopyAdmin,
+  FooterAdmin,
+  HeaderAdmin,
+  PostLoginPopupAdmin,
+  SiteIdentityAdmin,
+} from "@/components/SiteCmsAdmin";
+
 
 export const Route = createFileRoute("/_authenticated/cms")({
   component: CmsPage,
