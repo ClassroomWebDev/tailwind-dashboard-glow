@@ -248,6 +248,7 @@ export function AuthCopyAdmin() {
           value={form.helpline_text}
           rows={2}
           maxLength={300}
+          placeholder="Having trouble signing in? Contact our helpline:"
           onChange={(e) => setForm((f) => ({ ...f, helpline_text: e.target.value }))}
         />
       </Field>
