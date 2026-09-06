@@ -85,6 +85,10 @@ function CmsPage() {
           <TabsContent value="login" className="mt-6">
             <AuthCopyAdmin />
           </TabsContent>
+          <TabsContent value="popup" className="mt-6">
+            <PostLoginPopupAdmin />
+          </TabsContent>
+
           <TabsContent value="sections" className="mt-6">
             <CmsBoard />
           </TabsContent>
