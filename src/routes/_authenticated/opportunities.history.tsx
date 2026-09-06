@@ -267,41 +267,57 @@ function ScopedTable({
   showAmbassador: boolean;
 }) {
   const courseName = useCourseName();
+  const [term, setTerm] = useState("");
+  const sorted = useMemo(() => newestFirst(rows as unknown as Record<string, unknown>[]) as unknown as Sale[], [rows]);
+  const filtered = useMemo(() => sorted.filter((s) => matchesSale(s, term, courseName(s))), [sorted, term, courseName]);
+  const pagination = usePagination(filtered);
+
   return (
     <section className="space-y-4">
-      <h2 className="font-display text-xl font-semibold">{showAmbassador ? "Team sales" : "My sales"}</h2>
-      {rows.length === 0 ? (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold">{showAmbassador ? "Team sales" : "My sales"}</h2>
+        <Input
+          className="w-full sm:w-72"
+          placeholder="Search order, opportunity, student…"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+      </div>
+      {filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
           No opportunities recorded yet.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
-          <table className="w-full min-w-[720px] text-sm">
-            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Submitted</th>
-                <th className="px-4 py-3">Order ID</th>
-                <th className="px-4 py-3">Course</th>
-                <th className="px-4 py-3">Amount</th>
-                {showAmbassador ? <th className="px-4 py-3">Ambassador</th> : null}
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((s) => (
-                <tr key={s.id} className="border-t border-border">
-                  <td className="px-4 py-3 text-muted-foreground">{formatDateTime(s.created_at)}</td>
-                  <td className="px-4 py-3">{s.order_no ?? "—"}</td>
-                  <td className="px-4 py-3">{courseName(s)}</td>
-                  <td className="px-4 py-3 font-medium">{money(Number(s.amount))}</td>
-                  {showAmbassador ? <td className="px-4 py-3">{nameWithId(people?.[s.ambassador_id])}</td> : null}
-                  <td className="px-4 py-3">
-                    <StatusBadge status={s.status} />
-                  </td>
+        <div>
+          <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Submitted</th>
+                  <th className="px-4 py-3">Order ID</th>
+                  <th className="px-4 py-3">Opportunity</th>
+                  <th className="px-4 py-3">Amount</th>
+                  {showAmbassador ? <th className="px-4 py-3">Ambassador</th> : null}
+                  <th className="px-4 py-3">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pagination.rows.map((s) => (
+                  <tr key={s.id} className="border-t border-border">
+                    <td className="px-4 py-3 text-muted-foreground">{formatDateTime(s.created_at)}</td>
+                    <td className="px-4 py-3">{s.order_no ?? "—"}</td>
+                    <td className="px-4 py-3">{courseName(s)}</td>
+                    <td className="px-4 py-3 font-medium">{money(Number(s.amount))}</td>
+                    {showAmbassador ? <td className="px-4 py-3">{nameWithId(people?.[s.ambassador_id])}</td> : null}
+                    <td className="px-4 py-3">
+                      <StatusBadge status={s.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <TablePagination pagination={pagination} label="opportunities" />
         </div>
       )}
     </section>
