@@ -1003,6 +1003,7 @@ export type Database = {
           date_of_birth: string | null
           designation: string | null
           education: Json
+          email: string | null
           experience: string | null
           facebook_link: string | null
           father_name: string | null
@@ -1064,6 +1065,7 @@ export type Database = {
           date_of_birth?: string | null
           designation?: string | null
           education?: Json
+          email?: string | null
           experience?: string | null
           facebook_link?: string | null
           father_name?: string | null
@@ -1125,6 +1127,7 @@ export type Database = {
           date_of_birth?: string | null
           designation?: string | null
           education?: Json
+          email?: string | null
           experience?: string | null
           facebook_link?: string | null
           father_name?: string | null
