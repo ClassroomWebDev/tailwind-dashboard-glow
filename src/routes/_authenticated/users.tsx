@@ -87,7 +87,6 @@ type MemberRow = {
 };
 
 function UsersPage() {
-  const list = useServerFn(listMembers);
   const navigate = useNavigate();
   const { data: myRole, isLoading: roleLoading } = useMyRole();
   const allowed =
