@@ -4,10 +4,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Eye, KeyRound, Loader2, Pencil, Printer, Search, ShieldCheck, Trash2, UserPlus } from "lucide-react";
+import { fetchMembers } from "@/lib/members-client";
 import {
   createMember,
   deleteMember,
-  listMembers,
   resetUserPassword,
   setMemberStatus,
   updateMember,
@@ -87,7 +87,6 @@ type MemberRow = {
 };
 
 function UsersPage() {
-  const list = useServerFn(listMembers);
   const navigate = useNavigate();
   const { data: myRole, isLoading: roleLoading } = useMyRole();
   const allowed =
@@ -104,7 +103,7 @@ function UsersPage() {
 
   const members = useQuery({
     queryKey: ["members"],
-    queryFn: () => list(),
+    queryFn: () => fetchMembers(),
     enabled: allowed,
   });
 

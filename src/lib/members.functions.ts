@@ -9,68 +9,6 @@ import {
   updateMemberSchema,
 } from "./members.server";
 
-export const listMembers = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [{ data: profiles, error }, { data: roles }, authUsers] = await Promise.all([
-      supabaseAdmin
-        .from("profiles")
-        .select(
-          "id, auto_id, full_name, mobile, status, institution, designation, mentor_id, coordinator_id, support_manager_id, learning_points, leadership_points, created_at, created_by, season_id",
-        )
-        .order("auto_id"),
-      supabaseAdmin.from("user_roles").select("user_id, role"),
-      supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
-    ]);
-    if (error) throw new Error(error.message);
-    const roleMap = new Map<string, string>();
-    for (const r of roles ?? []) roleMap.set(r.user_id, r.role);
-    const emailMap = new Map<string, string>();
-    for (const u of authUsers.data?.users ?? []) if (u.email) emailMap.set(u.id, u.email);
-    const nameMap = new Map<string, string>();
-    const autoIdMap = new Map<string, string | null>();
-    for (const p of profiles ?? []) {
-      nameMap.set(p.id, p.full_name);
-      autoIdMap.set(p.id, p.auto_id);
-    }
-
-    // Strict hierarchy scoping — a member only ever sees their own reporting line.
-    const uid = context.userId;
-    const myRoles = new Set((roles ?? []).filter((r) => r.user_id === uid).map((r) => r.role as string));
-    const visible = (profiles ?? []).filter((p) => {
-      if (myRoles.has("admin")) return true;
-      if (p.id === uid) return true;
-      if (myRoles.has("support_manager")) return p.support_manager_id === uid;
-      if (myRoles.has("mentor")) return p.mentor_id === uid;
-      if (myRoles.has("coordinator")) return p.coordinator_id === uid;
-      return false;
-    });
-
-    const link = (id: string | null) =>
-      id ? { name: nameMap.get(id) ?? null, auto_id: autoIdMap.get(id) ?? null } : { name: null, auto_id: null };
-
-    return visible.map((p) => {
-      const mgr = link(p.support_manager_id);
-      const fac = link(p.mentor_id);
-      const coord = link(p.coordinator_id);
-      return {
-        ...p,
-        role: roleMap.get(p.id) ?? "ambassador",
-        email: emailMap.get(p.id) ?? null,
-        creator_name: p.created_by ? (nameMap.get(p.created_by) ?? null) : null,
-        creator_role: p.created_by ? (roleMap.get(p.created_by) ?? null) : null,
-        manager_name: mgr.name,
-        manager_auto_id: mgr.auto_id,
-        faculty_name: fac.name,
-        faculty_auto_id: fac.auto_id,
-        coordinator_name: coord.name,
-        coordinator_auto_id: coord.auto_id,
-      };
-    });
-  });
-
-
 export const updateMember = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => updateMemberSchema.parse(data))
   .middleware([requireSupabaseAuth])
@@ -121,6 +59,7 @@ export const updateMember = createServerFn({ method: "POST" })
         mobile: rest.mobile,
         institution: rest.institution ?? null,
         designation: rest.designation ?? null,
+        ...(rest.email ? { email: rest.email.trim().toLowerCase() } : {}),
         mentor_id: rest.mentor_id ?? null,
         support_manager_id: rest.support_manager_id ?? null,
         coordinator_id: rest.coordinator_id ?? null,
@@ -173,6 +112,7 @@ export const createMember = createServerFn({ method: "POST" })
         mobile: data.mobile,
         institution: data.institution ?? null,
         designation: data.designation ?? null,
+        email: data.email.trim().toLowerCase(),
         mentor_id: data.role === "ambassador" || data.role === "coordinator" ? (data.mentor_id ?? null) : null,
         support_manager_id: data.role === "support_manager" ? null : (data.support_manager_id ?? null),
         coordinator_id: data.role === "ambassador" ? (data.coordinator_id ?? null) : null,
