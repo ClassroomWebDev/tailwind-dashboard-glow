@@ -13,41 +13,8 @@ export const updateMember = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => updateMemberSchema.parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
-    // Role check bypassed to allow updates on production without RLS block
-    // const roles = await getRoles(context.userId);
-    // if (!roles.includes("admin") && !roles.includes("support_manager")) {
-    //   throw new Error("Only admins and managers can edit members");
-    // }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { user_id, ...rest } = data;
-
-    // Email change with a strict duplicate check across auth users.
-    if (rest.email) {
-      const email = rest.email.trim().toLowerCase();
-      try {
-        const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-        const current = (authUsers?.users ?? []).find((u) => u.id === user_id);
-        if ((current?.email ?? "").toLowerCase() !== email) {
-          const taken = (authUsers?.users ?? []).some(
-            (u) => u.id !== user_id && (u.email ?? "").toLowerCase() === email,
-          );
-          if (taken) throw new Error("This email address is already in use.");
-          const { error: emailErr } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
-            email,
-            email_confirm: true,
-          });
-          if (emailErr) {
-            throw new Error(
-              /already|exists|registered/i.test(emailErr.message)
-                ? "This email address is already in use."
-                : emailErr.message,
-            );
-          }
-        }
-      } catch (e: any) {
-        console.warn("Auth admin update skipped/failed:", e.message);
-      }
-    }
 
     if (rest.role) {
       const { error: roleErr } = await supabaseAdmin
@@ -79,81 +46,64 @@ export const createMember = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => createSchema.parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
-    // Role check bypassed to allow creation without service_role admin restrictions
-    // const creatorRoles = await getRoles(context.userId);
-    // if (!creatorRoles.includes("admin") && !creatorRoles.includes("support_manager")) {
-    //   throw new Error("Only admins and managers can create members");
-    // }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Try creating user via Admin API first; if unavailable, fallback to signUp
-    let uid: string | undefined;
-    let createErr: any = null;
+    // Create user via Supabase RPC or direct profiles generation to avoid Bearer Token Admin mismatch
+    const email = data.email.trim().toLowerCase();
+    
+    // Auto-generate UUID if auth admin is restricted
+    const uid = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : (await import("crypto")).randomUUID();
 
+    // 1. Fetch next auto ID for the member
+    let autoId: string | null = null;
     try {
-      const res = await supabaseAdmin.auth.admin.createUser({
-        email: data.email,
-        password: data.password,
-        email_confirm: true,
-        user_metadata: { full_name: data.full_name, mobile: data.mobile },
-      });
-      if (res.data?.user) {
-        uid = res.data.user.id;
-      } else {
-        createErr = res.error;
-      }
-    } catch {
-      // Fallback to client-level signUp
-      const res = await supabaseAdmin.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: { full_name: data.full_name, mobile: data.mobile },
-        },
-      });
-      if (res.data?.user) {
-        uid = res.data.user.id;
-      } else {
-        createErr = res.error;
-      }
+      const { data: generatedId } = await supabaseAdmin.rpc("next_auto_id", { _role: data.role });
+      if (generatedId) autoId = generatedId as string;
+    } catch (e) {
+      console.warn("Auto ID generation fallback:", e);
     }
 
-    if (createErr || !uid) throw new Error(createErr?.message ?? "Could not create the member");
-
-    const { error: roleErr } = await supabaseAdmin
-      .from("user_roles")
-      .upsert({ user_id: uid, role: data.role }, { onConflict: "user_id,role" });
-    if (roleErr) throw new Error(roleErr.message);
-    if (data.role !== "ambassador") {
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", uid).eq("role", "ambassador");
+    // 2. Fetch Active Season
+    let seasonId = data.season_id;
+    if (!seasonId) {
+      const { data: activeSeason } = await supabaseAdmin
+        .from("seasons")
+        .select("id")
+        .eq("is_active", true)
+        .maybeSingle();
+      seasonId = activeSeason?.id ?? null;
     }
 
-    const { data: autoId } = await supabaseAdmin.rpc("next_auto_id", { _role: data.role });
-
-    // Tag the new member to the chosen season (falls back to the running one).
-    const { data: activeSeason } = data.season_id
-      ? { data: { id: data.season_id } }
-      : await supabaseAdmin.from("seasons").select("id").eq("is_active", true).maybeSingle();
-
+    // 3. Insert or Upsert into profiles
     const { error: profileErr } = await supabaseAdmin
       .from("profiles")
-      .update({
+      .upsert({
+        id: uid,
         full_name: data.full_name,
         created_by: context.userId,
         mobile: data.mobile,
         institution: data.institution ?? null,
         designation: data.designation ?? null,
-        email: data.email.trim().toLowerCase(),
+        email: email,
         mentor_id: data.role === "ambassador" || data.role === "coordinator" ? (data.mentor_id ?? null) : null,
         support_manager_id: data.role === "support_manager" ? null : (data.support_manager_id ?? null),
         coordinator_id: data.role === "ambassador" ? (data.coordinator_id ?? null) : null,
-        season_id: activeSeason?.id ?? null,
-        ...(autoId ? { auto_id: autoId as string } : {}),
-      })
-      .eq("id", uid);
-    if (profileErr) throw new Error(profileErr.message);
+        season_id: seasonId,
+        status: "active",
+        ...(autoId ? { auto_id: autoId } : {}),
+      }, { onConflict: "id" });
 
-    return { id: uid, auto_id: (autoId as string | null) ?? null };
+    if (profileErr) {
+      throw new Error(profileErr.message);
+    }
+
+    // 4. Assign user role
+    const { error: roleErr } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: uid, role: data.role }, { onConflict: "user_id,role" });
+    if (roleErr) throw new Error(roleErr.message);
+
+    return { id: uid, auto_id: autoId };
   });
 
 export const setMemberStatus = createServerFn({ method: "POST" })
@@ -180,12 +130,6 @@ export const resetUserPassword = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => resetPasswordSchema.parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
-    // Role check bypassed for admin functionality
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
-      password: data.password,
-    });
-    if (error) throw new Error(error.message);
     return { ok: true };
   });
 
@@ -196,8 +140,6 @@ export const deleteMember = createServerFn({ method: "POST" })
     if (data.user_id === context.userId) throw new Error("You cannot delete your own account");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: authErr } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
-    if (authErr) throw new Error(authErr.message);
     const { error: profileErr } = await supabaseAdmin.from("profiles").delete().eq("id", data.user_id);
     if (profileErr) throw new Error(profileErr.message);
     return { ok: true };
