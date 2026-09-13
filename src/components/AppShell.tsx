@@ -274,11 +274,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           }`}
         />
         <aside
-          className={`absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-sidebar px-5 py-6 text-sidebar-foreground shadow-raised transition-transform duration-300 ease-out ${
+          className={`absolute inset-y-0 left-0 flex h-full w-72 max-w-[85vw] flex-col bg-sidebar px-5 py-6 text-sidebar-foreground shadow-raised transition-transform duration-300 ease-out ${
             menuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex shrink-0 items-center justify-between gap-2">
             <Brand />
             <button
               type="button"
@@ -289,7 +289,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <X className="size-5" />
             </button>
           </div>
-          <nav className="mt-6 flex flex-1 flex-col gap-1">
+          <nav className="slim-scrollbar mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
             {NAV.map((item) => (
               <Link
                 key={item.key ?? item.to}
