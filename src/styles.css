@@ -235,3 +235,18 @@
     animation: none;
   }
 }
+
+.slim-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--sidebar-foreground) 30%, transparent) transparent;
+}
+.slim-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.slim-scrollbar::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--sidebar-foreground) 30%, transparent);
+  border-radius: 9999px;
+}
+.slim-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
