@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Download, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createClient } from "@supabase/supabase-js";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSessionUser } from "@/hooks/useProfile";
 import { DistrictSelect } from "@/components/DistrictSelect";
@@ -34,17 +34,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Dedicated Supabase Storage client pointing to your personal project where buckets exist
-const STORAGE_SUPABASE_URL = "https://xdirggagbyeljgzkfkfe.supabase.co";
-const STORAGE_SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkaXJnZ2FnYnllbGpna3pma2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Mzg1NDQsImV4cCI6MjEwNDQxNDU0NH0.EonpN-wafT7eSML_1oEK4nqfgvVKoP9WTB0ZIyxcD30";
+// Photos and signatures live in the project's own storage buckets.
 
-const storageClient = createClient(STORAGE_SUPABASE_URL, STORAGE_SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -118,13 +109,30 @@ const LONG_KEYS: EditableKey[] = ["career_objective", "experience", "present_add
 const SIGNATURE_TEXT_PREFIX = "text:";
 
 function usePublicStorageUrl(bucket: string, path: string | null) {
-  return useMemo(() => {
-    if (!path) return null;
-    if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    const { data } = storageClient.storage.from(bucket).getPublicUrl(path);
-    return data?.publicUrl ?? null;
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    if (!path) {
+      setUrl(null);
+      return;
+    }
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      setUrl(path);
+      return;
+    }
+    void supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, 60 * 60 * 24 * 7)
+      .then(({ data }) => {
+        if (active) setUrl(data?.signedUrl ?? null);
+      });
+    return () => {
+      active = false;
+    };
   }, [bucket, path]);
+  return url;
 }
+
 
 function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
@@ -193,8 +201,7 @@ function ProfilePage() {
     const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
     const path = `${profile.id}/${kind}-${Date.now()}.${ext}`;
 
-    // Uploads directly to your configured storage project
-    const { error: uploadError } = await storageClient.storage
+    const { error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(path, file, { upsert: true });
 
