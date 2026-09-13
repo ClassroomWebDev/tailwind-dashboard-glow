@@ -109,13 +109,30 @@ const LONG_KEYS: EditableKey[] = ["career_objective", "experience", "present_add
 const SIGNATURE_TEXT_PREFIX = "text:";
 
 function usePublicStorageUrl(bucket: string, path: string | null) {
-  return useMemo(() => {
-    if (!path) return null;
-    if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    const { data } = storageClient.storage.from(bucket).getPublicUrl(path);
-    return data?.publicUrl ?? null;
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    if (!path) {
+      setUrl(null);
+      return;
+    }
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      setUrl(path);
+      return;
+    }
+    void supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, 60 * 60 * 24 * 7)
+      .then(({ data }) => {
+        if (active) setUrl(data?.signedUrl ?? null);
+      });
+    return () => {
+      active = false;
+    };
   }, [bucket, path]);
+  return url;
 }
+
 
 function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
