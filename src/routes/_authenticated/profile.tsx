@@ -34,17 +34,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Dedicated Supabase Storage client pointing to your personal project where buckets exist
-const STORAGE_SUPABASE_URL = "https://xdirggagbyeljgzkfkfe.supabase.co";
-const STORAGE_SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkaXJnZ2FnYnllbGpna3pma2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Mzg1NDQsImV4cCI6MjEwNDQxNDU0NH0.EonpN-wafT7eSML_1oEK4nqfgvVKoP9WTB0ZIyxcD30";
+// Photos and signatures live in the project's own storage buckets.
 
-const storageClient = createClient(STORAGE_SUPABASE_URL, STORAGE_SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
