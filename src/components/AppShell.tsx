@@ -208,12 +208,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Desktop side navigation */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-sidebar px-5 py-7 text-sidebar-foreground lg:flex">
-        <div className="flex items-center justify-between gap-2">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden h-screen w-64 flex-col bg-sidebar px-5 py-7 text-sidebar-foreground lg:flex">
+        <div className="flex shrink-0 items-center justify-between gap-2">
           <Brand />
           <ThemeToggle className="border-sidebar-border/60 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
         </div>
-        <nav className="mt-8 flex flex-1 flex-col gap-1">
+        <nav className="slim-scrollbar mt-8 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
           {NAV.map((item) => (
             <Link
               key={item.key ?? item.to}
