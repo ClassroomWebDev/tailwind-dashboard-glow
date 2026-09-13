@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Download, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSessionUser } from "@/hooks/useProfile";
 import { DistrictSelect } from "@/components/DistrictSelect";
@@ -32,6 +33,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+// Dedicated Supabase Storage client pointing to your personal project where buckets exist
+const STORAGE_SUPABASE_URL = "https://xdirggagbyeljgzkfkfe.supabase.co";
+const STORAGE_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkaXJnZ2FnYnllbGpna3pma2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Mzg1NDQsImV4cCI6MjEwNDQxNDU0NH0.EonpN-wafT7eSML_1oEK4nqfgvVKoP9WTB0ZIyxcD30";
+
+const storageClient = createClient(STORAGE_SUPABASE_URL, STORAGE_SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+  },
+});
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -108,7 +121,7 @@ function usePublicStorageUrl(bucket: string, path: string | null) {
   return useMemo(() => {
     if (!path) return null;
     if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    const { data } = storageClient.storage.from(bucket).getPublicUrl(path);
     return data?.publicUrl ?? null;
   }, [bucket, path]);
 }
@@ -130,7 +143,7 @@ function ProfilePage() {
   const signatureIsText = !!signature?.startsWith(SIGNATURE_TEXT_PREFIX);
   const signatureText = signatureIsText ? signature!.slice(SIGNATURE_TEXT_PREFIX.length) : null;
 
-  // Uses existing public storage buckets
+  // Retrieve public image URLs from personal Supabase storage
   const photoUrl = usePublicStorageUrl("avatars", photoPath);
   const signatureUrl = usePublicStorageUrl("signatures", signatureIsText ? null : signature);
 
@@ -180,7 +193,8 @@ function ProfilePage() {
     const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
     const path = `${profile.id}/${kind}-${Date.now()}.${ext}`;
 
-    const { error: uploadError } = await supabase.storage
+    // Uploads directly to your configured storage project
+    const { error: uploadError } = await storageClient.storage
       .from(bucketName)
       .upload(path, file, { upsert: true });
 
