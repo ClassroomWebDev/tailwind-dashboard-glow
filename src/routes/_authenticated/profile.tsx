@@ -201,8 +201,7 @@ function ProfilePage() {
     const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
     const path = `${profile.id}/${kind}-${Date.now()}.${ext}`;
 
-    // Uploads directly to your configured storage project
-    const { error: uploadError } = await storageClient.storage
+    const { error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(path, file, { upsert: true });
 
