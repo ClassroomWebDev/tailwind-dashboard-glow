@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Download, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createClient } from "@supabase/supabase-js";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSessionUser } from "@/hooks/useProfile";
 import { DistrictSelect } from "@/components/DistrictSelect";
