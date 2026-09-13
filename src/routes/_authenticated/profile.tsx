@@ -104,25 +104,13 @@ const facebookSchema = z
 const LONG_KEYS: EditableKey[] = ["career_objective", "experience", "present_address", "permanent_address"];
 const SIGNATURE_TEXT_PREFIX = "text:";
 
-function useSignedUrl(path: string | null) {
-  const [url, setUrl] = useState<string | null>(null);
-  useEffect(() => {
-    if (!path) {
-      setUrl(null);
-      return;
-    }
-    let active = true;
-    void supabase.storage
-      .from("profile-photos")
-      .createSignedUrl(path, 3600)
-      .then(({ data }) => {
-        if (active) setUrl(data?.signedUrl ?? null);
-      });
-    return () => {
-      active = false;
-    };
-  }, [path]);
-  return url;
+function usePublicStorageUrl(bucket: string, path: string | null) {
+  return useMemo(() => {
+    if (!path) return null;
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    return data?.publicUrl ?? null;
+  }, [bucket, path]);
 }
 
 function ProfilePage() {
@@ -141,8 +129,10 @@ function ProfilePage() {
   const email = user?.email ?? "";
   const signatureIsText = !!signature?.startsWith(SIGNATURE_TEXT_PREFIX);
   const signatureText = signatureIsText ? signature!.slice(SIGNATURE_TEXT_PREFIX.length) : null;
-  const photoUrl = useSignedUrl(photoPath);
-  const signatureUrl = useSignedUrl(signatureIsText ? null : signature);
+
+  // Uses existing public storage buckets
+  const photoUrl = usePublicStorageUrl("avatars", photoPath);
+  const signatureUrl = usePublicStorageUrl("signatures", signatureIsText ? null : signature);
 
   useEffect(() => {
     if (!profile) return;
@@ -185,16 +175,21 @@ function ProfilePage() {
     }
     const setBusy = kind === "photo" ? setUploading : setUploadingSign;
     setBusy(true);
+
+    const bucketName = kind === "photo" ? "avatars" : "signatures";
     const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
     const path = `${profile.id}/${kind}-${Date.now()}.${ext}`;
+
     const { error: uploadError } = await supabase.storage
-      .from("profile-photos")
+      .from(bucketName)
       .upload(path, file, { upsert: true });
+
     if (uploadError) {
       setBusy(false);
       toast.error(uploadError.message);
       return;
     }
+
     const column = kind === "photo" ? { photo_url: path } : { signature_url: path };
     const { error } = await supabase.from("profiles").update(column).eq("id", profile.id);
     setBusy(false);
@@ -202,6 +197,7 @@ function ProfilePage() {
       toast.error(error.message);
       return;
     }
+
     if (kind === "photo") setPhotoPath(path);
     else setSignature(path);
     void queryClient.invalidateQueries({ queryKey: ["profile"] });
