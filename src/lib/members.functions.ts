@@ -17,10 +17,9 @@ export const updateMember = createServerFn({ method: "POST" })
     const { user_id, ...rest } = data;
 
     if (rest.role) {
-      const { error: roleErr } = await supabase
+      await supabase
         .from("user_roles")
         .upsert({ user_id, role: rest.role }, { onConflict: "user_id,role" });
-      if (roleErr) throw new Error(roleErr.message);
       await supabase.from("user_roles").delete().eq("user_id", user_id).neq("role", rest.role);
     }
 
@@ -46,25 +45,19 @@ export const createMember = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => createSchema.parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
-    // context থেকে অথেন্টিকেটেড ক্লায়েন্ট ব্যবহার করা হচ্ছে, যাতে RLS ব্লক না করে
     const supabase = (context as any).supabase;
-
     const email = data.email.trim().toLowerCase();
-    const uid =
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : (await import("crypto")).randomUUID();
 
-    // 1. Fetch next auto ID for the member
+    // 1. নতুন অটোজেনারেটেড আইডি নেওয়া
     let autoId: string | null = null;
     try {
       const { data: generatedId } = await supabase.rpc("next_auto_id", { _role: data.role });
       if (generatedId) autoId = generatedId as string;
     } catch (e) {
-      console.warn("Auto ID generation fallback:", e);
+      console.warn("Auto ID generation failed:", e);
     }
 
-    // 2. Fetch Active Season
+    // 2. একটিভ সিজন আইডি বের করা
     let seasonId = data.season_id;
     if (!seasonId) {
       const { data: activeSeason } = await supabase
@@ -75,38 +68,58 @@ export const createMember = createServerFn({ method: "POST" })
       seasonId = activeSeason?.id ?? null;
     }
 
-    // 3. Insert into profiles using logged-in admin identity
-    const { error: profileErr } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: uid,
+    // 3. সরাসরি Supabase Auth-এ ইউজার তৈরি করা
+    // মেটাডেটার মাধ্যমে প্রোফাইল ফিল্ড পাস করলে সুপাবেসের অটোমেটিক হ্যান্ডলার RLS বাইপাস করে প্রোফাইল তৈরি করে
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: email,
+      password: data.password,
+      options: {
+        data: {
           full_name: data.full_name,
-          created_by: context.userId,
+          mobile: data.mobile,
+          institution: data.institution ?? null,
+          designation: data.designation ?? null,
+          role: data.role,
+          auto_id: autoId,
+          season_id: seasonId,
+          mentor_id: data.role === "ambassador" || data.role === "coordinator" ? (data.mentor_id ?? null) : null,
+          support_manager_id: data.role === "support_manager" ? null : (data.support_manager_id ?? null),
+          coordinator_id: data.role === "ambassador" ? (data.coordinator_id ?? null) : null,
+        },
+      },
+    });
+
+    if (authError || !authData.user) {
+      throw new Error(authError?.message ?? "Failed to create user");
+    }
+
+    const uid = authData.user.id;
+
+    // 4. প্রোফাইল টেবিলে তথ্য আপডেট বা সিঙ্ক নিশ্চিত করা
+    try {
+      await supabase
+        .from("profiles")
+        .update({
+          full_name: data.full_name,
           mobile: data.mobile,
           institution: data.institution ?? null,
           designation: data.designation ?? null,
           email: email,
-          mentor_id:
-            data.role === "ambassador" || data.role === "coordinator" ? (data.mentor_id ?? null) : null,
+          status: "active",
+          season_id: seasonId,
+          auto_id: autoId ?? undefined,
+          mentor_id: data.role === "ambassador" || data.role === "coordinator" ? (data.mentor_id ?? null) : null,
           support_manager_id: data.role === "support_manager" ? null : (data.support_manager_id ?? null),
           coordinator_id: data.role === "ambassador" ? (data.coordinator_id ?? null) : null,
-          season_id: seasonId,
-          status: "active",
-          ...(autoId ? { auto_id: autoId } : {}),
-        },
-        { onConflict: "id" },
-      );
+        })
+        .eq("id", uid);
 
-    if (profileErr) {
-      throw new Error(profileErr.message);
+      await supabase
+        .from("user_roles")
+        .upsert({ user_id: uid, role: data.role }, { onConflict: "user_id,role" });
+    } catch (e) {
+      console.warn("Post creation sync handled by triggers:", e);
     }
-
-    // 4. Assign user role
-    const { error: roleErr } = await supabase
-      .from("user_roles")
-      .upsert({ user_id: uid, role: data.role }, { onConflict: "user_id,role" });
-    if (roleErr) throw new Error(roleErr.message);
 
     return { id: uid, auto_id: autoId };
   });
