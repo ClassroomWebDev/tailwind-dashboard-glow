@@ -1208,6 +1208,8 @@ export type Database = {
       }
       program_settings: {
         Row: {
+          assignment_max_points: number
+          assignment_min_points: number
           brand_logo_url: string | null
           brand_name: string | null
           brand_primary: string | null
@@ -1229,6 +1231,8 @@ export type Database = {
           value: Json | null
         }
         Insert: {
+          assignment_max_points?: number
+          assignment_min_points?: number
           brand_logo_url?: string | null
           brand_name?: string | null
           brand_primary?: string | null
@@ -1250,6 +1254,8 @@ export type Database = {
           value?: Json | null
         }
         Update: {
+          assignment_max_points?: number
+          assignment_min_points?: number
           brand_logo_url?: string | null
           brand_name?: string | null
           brand_primary?: string | null
@@ -1586,6 +1592,7 @@ export type Database = {
           id: string
           image_url: string | null
           social_url: string | null
+          sort_order: number
           title: string
           updated_at: string
           views_count: number
@@ -1597,6 +1604,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           social_url?: string | null
+          sort_order?: number
           title: string
           updated_at?: string
           views_count?: number
@@ -1608,6 +1616,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           social_url?: string | null
+          sort_order?: number
           title?: string
           updated_at?: string
           views_count?: number
@@ -1867,7 +1876,7 @@ export type Database = {
       }
     }
     Enums: {
-      account_status: "active" | "held"
+      account_status: "active" | "held" | "inactive" | "trashed"
       app_role:
         | "ambassador"
         | "coordinator"
@@ -2003,7 +2012,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      account_status: ["active", "held"],
+      account_status: ["active", "held", "inactive", "trashed"],
       app_role: [
         "ambassador",
         "coordinator",
