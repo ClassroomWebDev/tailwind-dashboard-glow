@@ -80,6 +80,64 @@ export type Database = {
           },
         ]
       }
+      assignment_scores: {
+        Row: {
+          ambassador_id: string
+          awarded_by: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          points: number
+          session_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          ambassador_id: string
+          awarded_by?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          points?: number
+          session_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          ambassador_id?: string
+          awarded_by?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          points?: number
+          session_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_scores_ambassador_id_fkey"
+            columns: ["ambassador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignment_scores_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignment_scores_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "class_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendances: {
         Row: {
           ambassador_id: string
