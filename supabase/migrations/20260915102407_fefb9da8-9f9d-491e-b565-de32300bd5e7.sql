@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.assignment_points_sync() FROM anon, authenticated, public;
