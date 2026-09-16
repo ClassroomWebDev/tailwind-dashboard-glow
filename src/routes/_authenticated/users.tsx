@@ -429,12 +429,14 @@ function MemberTable({
   const { data: settings } = useProgramSettings();
 
 
-  async function flip(m: MemberRow) {
+  async function changeStatus(m: MemberRow, status: "active" | "inactive" | "held" | "trashed") {
     setBusy(m.id);
     try {
-      await toggle({ data: { user_id: m.id, status: m.status === "held" ? "active" : "held" } });
-      toast.success(`${m.full_name || "Member"} is now ${m.status === "held" ? "active" : "held"}`);
+      await toggle({ data: { user_id: m.id, status } });
+      toast.success(`${m.full_name || "Member"} is now ${STATUS_LABELS[status]}`);
       await queryClient.invalidateQueries({ queryKey: ["members"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-team"] });
+      await queryClient.invalidateQueries({ queryKey: ["directory"] });
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
