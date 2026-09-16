@@ -409,10 +409,13 @@ function MemberTable({
   members,
   loading,
   isAdmin,
+  trash = false,
 }: {
   members: MemberRow[];
   loading: boolean;
   isAdmin: boolean;
+  /** Trash view — deleted accounts that only an admin can restore. */
+  trash?: boolean;
 }) {
   const queryClient = useQueryClient();
   const toggle = useServerFn(setMemberStatus);
