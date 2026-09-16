@@ -331,13 +331,20 @@ function MemberDirectory({ members, loading }: { members: MemberRow[]; loading: 
       );
   }, [members, search, seasonId]);
 
+  const activeRows = useMemo(() => filtered.filter((m) => m.status === "active"), [filtered]);
+  const pausedRows = useMemo(
+    () => filtered.filter((m) => m.status === "inactive" || m.status === "held"),
+    [filtered],
+  );
+  const trashedRows = useMemo(() => filtered.filter((m) => m.status === "trashed"), [filtered]);
+
   return (
     <section className="space-y-4">
       <Tabs defaultValue="all">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <TabsList className="flex-wrap">
             {TABS.map((t) => {
-              const count = (t.role ? filtered.filter((m) => m.role === t.role) : filtered).length;
+              const count = (t.role ? activeRows.filter((m) => m.role === t.role) : activeRows).length;
               return (
                 <TabsTrigger key={t.key} value={t.key} className="gap-1.5">
                   {t.label}
@@ -347,6 +354,20 @@ function MemberDirectory({ members, loading }: { members: MemberRow[]; loading: 
                 </TabsTrigger>
               );
             })}
+            <TabsTrigger value="paused" className="gap-1.5">
+              Inactive / On-Hold
+              <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                {pausedRows.length}
+              </Badge>
+            </TabsTrigger>
+            {isAdmin ? (
+              <TabsTrigger value="trash" className="gap-1.5">
+                Trash
+                <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                  {trashedRows.length}
+                </Badge>
+              </TabsTrigger>
+            ) : null}
           </TabsList>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <SeasonFilter value={seasonId} onChange={setSeasonId} seasons={seasons} canAccessAllSeasons={canAccessAllSeasons} />
