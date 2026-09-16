@@ -386,12 +386,20 @@ function MemberDirectory({ members, loading }: { members: MemberRow[]; loading: 
         {TABS.map((t) => (
           <TabsContent key={t.key} value={t.key} className="mt-4">
             <MemberTable
-              members={t.role ? filtered.filter((m) => m.role === t.role) : filtered}
+              members={t.role ? activeRows.filter((m) => m.role === t.role) : activeRows}
               loading={loading}
               isAdmin={isAdmin}
             />
           </TabsContent>
         ))}
+        <TabsContent value="paused" className="mt-4">
+          <MemberTable members={pausedRows} loading={loading} isAdmin={isAdmin} />
+        </TabsContent>
+        {isAdmin ? (
+          <TabsContent value="trash" className="mt-4">
+            <MemberTable members={trashedRows} loading={loading} isAdmin={isAdmin} trash />
+          </TabsContent>
+        ) : null}
       </Tabs>
     </section>
   );
