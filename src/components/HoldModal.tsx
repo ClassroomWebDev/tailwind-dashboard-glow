@@ -7,6 +7,36 @@ export type HoldNotice = {
 };
 
 export const HOLD_STORAGE_KEY = "account-hold-notice";
+export const DELETED_STORAGE_KEY = "account-deleted-notice";
+
+export function readDeletedNotice(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.sessionStorage.getItem(DELETED_STORAGE_KEY) === "1";
+}
+
+/** Non-dismissible gate shown when an account has been deleted (trashed). */
+export function DeletedModal() {
+  return (
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="deleted-title"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-surface-dark/95 p-4 backdrop-blur-sm"
+    >
+      <div className="w-full max-w-md rounded-3xl border border-border bg-card p-7 text-center text-card-foreground shadow-raised">
+        <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-accent text-primary">
+          <ShieldAlert className="size-7" />
+        </span>
+        <h2 id="deleted-title" className="mt-5 font-display text-2xl font-bold text-primary">
+          Account deleted
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Account deleted. Contact Admin.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export function readHoldNotice(): HoldNotice | null {
   if (typeof window === "undefined") return null;

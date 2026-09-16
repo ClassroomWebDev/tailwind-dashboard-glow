@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { HOLD_STORAGE_KEY } from "@/components/HoldModal";
+import { DELETED_STORAGE_KEY, HOLD_STORAGE_KEY } from "@/components/HoldModal";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -16,7 +16,14 @@ export const Route = createFileRoute("/_authenticated")({
       .eq("id", data.user.id)
       .maybeSingle();
 
-    if (profile?.status === "held") {
+    // Deleted (trashed) accounts are blocked outright.
+    if (profile?.status === "trashed") {
+      window.sessionStorage.setItem(DELETED_STORAGE_KEY, "1");
+      await supabase.auth.signOut();
+      throw redirect({ to: "/auth" });
+    }
+
+    if (profile?.status === "held" || profile?.status === "inactive") {
       let supportManager = null;
       if (profile.support_manager_id) {
         const { data: manager } = await supabase
