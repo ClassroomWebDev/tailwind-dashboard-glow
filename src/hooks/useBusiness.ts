@@ -62,6 +62,8 @@ export function useTeam() {
         .from("profiles")
         .select("id, full_name, mobile, designation, learning_points, leadership_points")
         .or(`coordinator_id.eq.${uid},mentor_id.eq.${uid},support_manager_id.eq.${uid}`)
+        // Inactive, on-hold and trashed members never appear in a roster or scoring sheet.
+        .eq("status", "active")
         .order("full_name");
       if (error) throw error;
       return (data ?? []) as TeamMember[];
