@@ -77,6 +77,7 @@ function SuccessStoryPage() {
   }, []);
 
   const rows = useMemo(() => stories ?? [], [stories]);
+  const move = useMoveStory();
   const pagination = usePagination(rows, PER_PAGE);
 
   const phone = settings?.org_helpline?.trim() || "";
@@ -155,6 +156,14 @@ function SuccessStoryPage() {
                   })
                 }
                 onInsights={() => setInsights(story)}
+                onMove={(dir) => {
+                  const from = rows.findIndex((s) => s.id === story.id);
+                  move.mutate(
+                    { stories: rows, from, to: from + dir },
+                    { onError: (e: Error) => toast.error(e.message) },
+                  );
+                }}
+                moving={move.isPending}
               />
             ))}
           </div>
