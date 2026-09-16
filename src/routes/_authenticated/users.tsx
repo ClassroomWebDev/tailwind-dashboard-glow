@@ -307,6 +307,15 @@ function CreateMemberForm({ members }: { members: MemberRow[] }) {
   );
 }
 
+export type MemberStatus = "active" | "inactive" | "held" | "trashed";
+
+const STATUS_LABELS: Record<MemberStatus, string> = {
+  active: "Active",
+  inactive: "Inactive",
+  held: "On Hold",
+  trashed: "Deleted",
+};
+
 const TABS: { key: string; label: string; role?: string }[] = [
   { key: "all", label: "All" },
   { key: "admin", label: "Admin", role: "admin" },
