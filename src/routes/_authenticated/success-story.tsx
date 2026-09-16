@@ -246,6 +246,24 @@ function StoryCard({
             <Button size="sm" variant="ghost" onClick={onInsights}>
               <BarChart3 className="size-4" /> Insights
             </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Move up"
+              disabled={moving}
+              onClick={() => onMove(-1)}
+            >
+              <ArrowUp className="size-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Move down"
+              disabled={moving}
+              onClick={() => onMove(1)}
+            >
+              <ArrowDown className="size-4" />
+            </Button>
             <Button size="sm" variant="ghost" onClick={onEdit}>
               <Pencil className="size-4" /> Edit
             </Button>
