@@ -16,7 +16,7 @@ export const createSchema = z.object({
 
 export const statusSchema = z.object({
   user_id: z.string().uuid(),
-  status: z.enum(["active", "held"]),
+  status: z.enum(["active", "inactive", "held", "trashed"]),
 });
 
 
