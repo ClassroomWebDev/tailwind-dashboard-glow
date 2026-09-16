@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  ArrowDown,
+  ArrowUp,
   BarChart3,
   ExternalLink,
   Eye,
@@ -20,6 +22,7 @@ import { useProgramSettings } from "@/hooks/useBusiness";
 import {
   markStoryViewed,
   useDeleteStory,
+  useMoveStory,
   useSaveStory,
   useStoryReactions,
   useSuccessStories,
@@ -74,6 +77,7 @@ function SuccessStoryPage() {
   }, []);
 
   const rows = useMemo(() => stories ?? [], [stories]);
+  const move = useMoveStory();
   const pagination = usePagination(rows, PER_PAGE);
 
   const phone = settings?.org_helpline?.trim() || "";
@@ -152,6 +156,14 @@ function SuccessStoryPage() {
                   })
                 }
                 onInsights={() => setInsights(story)}
+                onMove={(dir) => {
+                  const from = rows.findIndex((s) => s.id === story.id);
+                  move.mutate(
+                    { stories: rows, from, to: from + dir },
+                    { onError: (e: Error) => toast.error(e.message) },
+                  );
+                }}
+                moving={move.isPending}
               />
             ))}
           </div>
@@ -173,6 +185,8 @@ function StoryCard({
   onRead,
   onEdit,
   onInsights,
+  onMove,
+  moving,
 }: {
   story: SuccessStory;
   reactions: { story_id: string; user_id: string }[];
@@ -180,6 +194,8 @@ function StoryCard({
   onRead: () => void;
   onEdit: () => void;
   onInsights: () => void;
+  onMove: (direction: -1 | 1) => void;
+  moving: boolean;
 }) {
   const toggle = useToggleReaction();
   const remove = useDeleteStory();
@@ -229,6 +245,24 @@ function StoryCard({
             </Badge>
             <Button size="sm" variant="ghost" onClick={onInsights}>
               <BarChart3 className="size-4" /> Insights
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Move up"
+              disabled={moving}
+              onClick={() => onMove(-1)}
+            >
+              <ArrowUp className="size-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Move down"
+              disabled={moving}
+              onClick={() => onMove(1)}
+            >
+              <ArrowDown className="size-4" />
             </Button>
             <Button size="sm" variant="ghost" onClick={onEdit}>
               <Pencil className="size-4" /> Edit

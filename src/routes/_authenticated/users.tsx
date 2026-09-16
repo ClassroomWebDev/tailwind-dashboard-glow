@@ -307,6 +307,15 @@ function CreateMemberForm({ members }: { members: MemberRow[] }) {
   );
 }
 
+export type MemberStatus = "active" | "inactive" | "held" | "trashed";
+
+const STATUS_LABELS: Record<MemberStatus, string> = {
+  active: "Active",
+  inactive: "Inactive",
+  held: "On Hold",
+  trashed: "Deleted",
+};
+
 const TABS: { key: string; label: string; role?: string }[] = [
   { key: "all", label: "All" },
   { key: "admin", label: "Admin", role: "admin" },
@@ -331,13 +340,20 @@ function MemberDirectory({ members, loading }: { members: MemberRow[]; loading: 
       );
   }, [members, search, seasonId]);
 
+  const activeRows = useMemo(() => filtered.filter((m) => m.status === "active"), [filtered]);
+  const pausedRows = useMemo(
+    () => filtered.filter((m) => m.status === "inactive" || m.status === "held"),
+    [filtered],
+  );
+  const trashedRows = useMemo(() => filtered.filter((m) => m.status === "trashed"), [filtered]);
+
   return (
     <section className="space-y-4">
       <Tabs defaultValue="all">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <TabsList className="flex-wrap">
             {TABS.map((t) => {
-              const count = (t.role ? filtered.filter((m) => m.role === t.role) : filtered).length;
+              const count = (t.role ? activeRows.filter((m) => m.role === t.role) : activeRows).length;
               return (
                 <TabsTrigger key={t.key} value={t.key} className="gap-1.5">
                   {t.label}
@@ -347,6 +363,20 @@ function MemberDirectory({ members, loading }: { members: MemberRow[]; loading: 
                 </TabsTrigger>
               );
             })}
+            <TabsTrigger value="paused" className="gap-1.5">
+              Inactive / On-Hold
+              <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                {pausedRows.length}
+              </Badge>
+            </TabsTrigger>
+            {isAdmin ? (
+              <TabsTrigger value="trash" className="gap-1.5">
+                Trash
+                <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                  {trashedRows.length}
+                </Badge>
+              </TabsTrigger>
+            ) : null}
           </TabsList>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <SeasonFilter value={seasonId} onChange={setSeasonId} seasons={seasons} canAccessAllSeasons={canAccessAllSeasons} />
@@ -365,12 +395,20 @@ function MemberDirectory({ members, loading }: { members: MemberRow[]; loading: 
         {TABS.map((t) => (
           <TabsContent key={t.key} value={t.key} className="mt-4">
             <MemberTable
-              members={t.role ? filtered.filter((m) => m.role === t.role) : filtered}
+              members={t.role ? activeRows.filter((m) => m.role === t.role) : activeRows}
               loading={loading}
               isAdmin={isAdmin}
             />
           </TabsContent>
         ))}
+        <TabsContent value="paused" className="mt-4">
+          <MemberTable members={pausedRows} loading={loading} isAdmin={isAdmin} />
+        </TabsContent>
+        {isAdmin ? (
+          <TabsContent value="trash" className="mt-4">
+            <MemberTable members={trashedRows} loading={loading} isAdmin={isAdmin} trash />
+          </TabsContent>
+        ) : null}
       </Tabs>
     </section>
   );
@@ -380,10 +418,13 @@ function MemberTable({
   members,
   loading,
   isAdmin,
+  trash = false,
 }: {
   members: MemberRow[];
   loading: boolean;
   isAdmin: boolean;
+  /** Trash view — deleted accounts that only an admin can restore. */
+  trash?: boolean;
 }) {
   const queryClient = useQueryClient();
   const toggle = useServerFn(setMemberStatus);
@@ -397,12 +438,14 @@ function MemberTable({
   const { data: settings } = useProgramSettings();
 
 
-  async function flip(m: MemberRow) {
+  async function changeStatus(m: MemberRow, status: "active" | "inactive" | "held" | "trashed") {
     setBusy(m.id);
     try {
-      await toggle({ data: { user_id: m.id, status: m.status === "held" ? "active" : "held" } });
-      toast.success(`${m.full_name || "Member"} is now ${m.status === "held" ? "active" : "held"}`);
+      await toggle({ data: { user_id: m.id, status } });
+      toast.success(`${m.full_name || "Member"} is now ${STATUS_LABELS[status]}`);
       await queryClient.invalidateQueries({ queryKey: ["members"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-team"] });
+      await queryClient.invalidateQueries({ queryKey: ["directory"] });
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -444,7 +487,9 @@ function MemberTable({
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{m.institution || "—"}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={m.status === "held" ? "destructive" : "default"}>{m.status}</Badge>
+                    <Badge variant={m.status === "active" ? "default" : "destructive"}>
+                      {STATUS_LABELS[m.status as MemberStatus] ?? m.status}
+                    </Badge>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center justify-end gap-1.5">
@@ -469,21 +514,35 @@ function MemberTable({
                           <Trash2 className="size-4" />
                         </IconButton>
                       ) : null}
-                      {canManage ? (
-                        <Button
-                          size="sm"
-                          variant={m.status === "held" ? "default" : "secondary"}
+                      {trash ? (
+                        isAdmin ? (
+                          <Button
+                            size="sm"
+                            disabled={busy === m.id}
+                            onClick={() => void changeStatus(m, "active")}
+                          >
+                            {busy === m.id ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <ShieldCheck className="size-3.5" />
+                            )}
+                            Restore
+                          </Button>
+                        ) : null
+                      ) : canManage ? (
+                        <select
+                          aria-label="Account status"
+                          value={m.status}
                           disabled={busy === m.id}
-                          onClick={() => void flip(m)}
+                          onChange={(e) => void changeStatus(m, e.target.value as MemberStatus)}
+                          className="h-9 rounded-xl border border-input bg-background px-2 text-xs"
                         >
-                          {busy === m.id ? (
-                            <Loader2 className="size-3.5 animate-spin" />
-                          ) : (
-                            <ShieldCheck className="size-3.5" />
-                          )}
-                          {m.status === "held" ? "Activate" : "Hold account"}
-                        </Button>
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                          <option value="held">On hold</option>
+                        </select>
                       ) : null}
+
 
                     </div>
                   </td>

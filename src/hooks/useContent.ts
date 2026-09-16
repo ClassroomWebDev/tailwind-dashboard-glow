@@ -42,7 +42,7 @@ export function useEvents() {
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .order("starts_at", { ascending: true });
+        .order("starts_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },

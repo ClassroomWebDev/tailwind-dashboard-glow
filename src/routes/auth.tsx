@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { HoldModal, readHoldNotice, type HoldNotice } from "@/components/HoldModal";
+import {
+  DeletedModal,
+  HoldModal,
+  readDeletedNotice,
+  readHoldNotice,
+  type HoldNotice,
+} from "@/components/HoldModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,11 +55,13 @@ function AuthPage() {
   const copy = site?.auth ?? DEFAULT_SITE_SETTINGS.auth;
   const [mode, setMode] = useState<Mode>("login");
   const [hold, setHold] = useState<HoldNotice | null>(null);
+  const [deleted, setDeleted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", full_name: "", mobile: "" });
 
   useEffect(() => {
     setHold(readHoldNotice());
+    setDeleted(readDeletedNotice());
   }, []);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -111,6 +119,7 @@ function AuthPage() {
     }
   }
 
+  if (deleted) return <DeletedModal />;
   if (hold) return <HoldModal notice={hold} />;
 
   const titleSize = { sm: "text-2xl", md: "text-3xl", lg: "text-4xl", xl: "text-5xl" }[copy.left_title_size];

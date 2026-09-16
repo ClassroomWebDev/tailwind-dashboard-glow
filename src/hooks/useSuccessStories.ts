@@ -12,10 +12,32 @@ export function useSuccessStories() {
       const { data, error } = await supabase
         .from("success_stories")
         .select("*")
+        .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
+  });
+}
+
+/** Swaps a story with its neighbour and renormalises every position. */
+export function useMoveStory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ stories, from, to }: { stories: SuccessStory[]; from: number; to: number }) => {
+      if (to < 0 || to >= stories.length) return;
+      const next = [...stories];
+      const moved = next.splice(from, 1)[0];
+      if (!moved) return;
+      next.splice(to, 0, moved);
+      for (let i = 0; i < next.length; i += 1) {
+        const row = next[i]!;
+        if (row.sort_order === i) continue;
+        const { error } = await supabase.from("success_stories").update({ sort_order: i }).eq("id", row.id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["success-stories"] }),
   });
 }
 

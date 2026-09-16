@@ -151,7 +151,11 @@ export const deleteMember = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     if (data.user_id === context.userId) throw new Error("You cannot delete your own account");
     const supabase = (context as any).supabase;
-    const { error: profileErr } = await supabase.from("profiles").delete().eq("id", data.user_id);
+    // Soft delete: the member moves to Trash and is blocked from signing in.
+    const { error: profileErr } = await supabase
+      .from("profiles")
+      .update({ status: "trashed" })
+      .eq("id", data.user_id);
     if (profileErr) throw new Error(profileErr.message);
     return { ok: true };
   });

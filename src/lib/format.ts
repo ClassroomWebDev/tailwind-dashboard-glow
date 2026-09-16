@@ -13,12 +13,15 @@ function toDate(value: string | number | Date | null | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-/** e.g. `21-Aug-2026` */
-export function formatDate(value: string | number | Date | null | undefined, fallback = "—"): string {
+/** Universal app date format — e.g. `15 Sep 2026` */
+export function formatAppDate(value: string | number | Date | null | undefined, fallback = "—"): string {
   const d = toDate(value);
   if (!d) return fallback;
-  return `${String(d.getDate()).padStart(2, "0")}-${MONTHS[d.getMonth()]}-${d.getFullYear()}`;
+  return `${String(d.getDate()).padStart(2, "0")} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
+
+/** Alias kept for existing call sites — same `DD MMM YYYY` output. */
+export const formatDate = formatAppDate;
 
 /** e.g. `11:54 PM` — accepts a Date/ISO string or a bare `HH:mm[:ss]` time. */
 export function formatTime(value: string | number | Date | null | undefined, fallback = "—"): string {
