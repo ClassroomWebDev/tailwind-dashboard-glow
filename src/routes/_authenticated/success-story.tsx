@@ -185,6 +185,8 @@ function StoryCard({
   onRead,
   onEdit,
   onInsights,
+  onMove,
+  moving,
 }: {
   story: SuccessStory;
   reactions: { story_id: string; user_id: string }[];
@@ -192,6 +194,8 @@ function StoryCard({
   onRead: () => void;
   onEdit: () => void;
   onInsights: () => void;
+  onMove: (direction: -1 | 1) => void;
+  moving: boolean;
 }) {
   const toggle = useToggleReaction();
   const remove = useDeleteStory();
