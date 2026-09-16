@@ -478,7 +478,9 @@ function MemberTable({
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{m.institution || "—"}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={m.status === "held" ? "destructive" : "default"}>{m.status}</Badge>
+                    <Badge variant={m.status === "active" ? "default" : "destructive"}>
+                      {STATUS_LABELS[m.status as MemberStatus] ?? m.status}
+                    </Badge>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center justify-end gap-1.5">
@@ -503,21 +505,35 @@ function MemberTable({
                           <Trash2 className="size-4" />
                         </IconButton>
                       ) : null}
-                      {canManage ? (
-                        <Button
-                          size="sm"
-                          variant={m.status === "held" ? "default" : "secondary"}
+                      {trash ? (
+                        isAdmin ? (
+                          <Button
+                            size="sm"
+                            disabled={busy === m.id}
+                            onClick={() => void changeStatus(m, "active")}
+                          >
+                            {busy === m.id ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <ShieldCheck className="size-3.5" />
+                            )}
+                            Restore
+                          </Button>
+                        ) : null
+                      ) : canManage ? (
+                        <select
+                          aria-label="Account status"
+                          value={m.status}
                           disabled={busy === m.id}
-                          onClick={() => void flip(m)}
+                          onChange={(e) => void changeStatus(m, e.target.value as MemberStatus)}
+                          className="h-9 rounded-xl border border-input bg-background px-2 text-xs"
                         >
-                          {busy === m.id ? (
-                            <Loader2 className="size-3.5 animate-spin" />
-                          ) : (
-                            <ShieldCheck className="size-3.5" />
-                          )}
-                          {m.status === "held" ? "Activate" : "Hold account"}
-                        </Button>
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                          <option value="held">On hold</option>
+                        </select>
                       ) : null}
+
 
                     </div>
                   </td>
