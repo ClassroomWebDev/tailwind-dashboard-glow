@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { HoldModal, readHoldNotice, type HoldNotice } from "@/components/HoldModal";
+import {
+  DeletedModal,
+  HoldModal,
+  readDeletedNotice,
+  readHoldNotice,
+  type HoldNotice,
+} from "@/components/HoldModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
