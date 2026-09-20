@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated/attendance'
 import { Route as AuthenticatedBigOpportunityRouteImport } from './routes/_authenticated/big-opportunity'
 import { Route as AuthenticatedBrandingRouteImport } from './routes/_authenticated/branding'
@@ -61,6 +62,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAssignmentsRoute =
+  AuthenticatedAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
   id: '/attendance',
   path: '/attendance',
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/assignments': typeof AuthenticatedAssignmentsRoute
   '/attendance': typeof AuthenticatedAttendanceRoute
   '/big-opportunity': typeof AuthenticatedBigOpportunityRoute
   '/branding': typeof AuthenticatedBrandingRoute
@@ -213,6 +221,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/assignments': typeof AuthenticatedAssignmentsRoute
   '/attendance': typeof AuthenticatedAttendanceRoute
   '/big-opportunity': typeof AuthenticatedBigOpportunityRoute
   '/branding': typeof AuthenticatedBrandingRoute
@@ -243,6 +252,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
   '/_authenticated/big-opportunity': typeof AuthenticatedBigOpportunityRoute
   '/_authenticated/branding': typeof AuthenticatedBrandingRoute
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/apply'
     | '/auth'
+    | '/assignments'
     | '/attendance'
     | '/big-opportunity'
     | '/branding'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/apply'
     | '/auth'
+    | '/assignments'
     | '/attendance'
     | '/big-opportunity'
     | '/branding'
@@ -330,6 +342,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/apply'
     | '/auth'
+    | '/_authenticated/assignments'
     | '/_authenticated/attendance'
     | '/_authenticated/big-opportunity'
     | '/_authenticated/branding'
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/assignments': {
+      id: '/_authenticated/assignments'
+      path: '/assignments'
+      fullPath: '/assignments'
+      preLoaderRoute: typeof AuthenticatedAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/attendance': {
       id: '/_authenticated/attendance'
@@ -557,6 +577,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
   AuthenticatedBigOpportunityRoute: typeof AuthenticatedBigOpportunityRoute
   AuthenticatedBrandingRoute: typeof AuthenticatedBrandingRoute
@@ -582,6 +603,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
   AuthenticatedBigOpportunityRoute: AuthenticatedBigOpportunityRoute,
   AuthenticatedBrandingRoute: AuthenticatedBrandingRoute,
